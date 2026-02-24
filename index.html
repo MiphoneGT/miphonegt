@@ -3289,27 +3289,35 @@ async function submitRegister(e) {
   const nit       = document.getElementById('reg-nit').value.trim() || 'No proporcionado';
   const ahora     = new Date().toLocaleString('es-GT', { timeZone: 'America/Guatemala' });
 
-  // Variables que coinciden EXACTAMENTE con tu plantilla de EmailJS:
-  // {{name}}, {{email}}, {{title}}, {{message}}
+  // Variables que coinciden EXACTAMENTE con tu plantilla de EmailJS
   const templateParams = {
-    title:   'Nuevo Registro — MiPhoneGT',
-    name:    nombre,
-    email:   correo,
+    // Variables principales que usa la plantilla
+    title:              'Nuevo Registro — MiPhoneGT',
+    name:               nombre,
+    email:              correo,
+    // Variables individuales que aparecen en el cuerpo del template
+    nombre_completo:    nombre,
+    correo_usuario:     correo,
+    telefono:           telefono,
+    departamento:       depto,
+    municipio:          municipio,
+    direccion_entrega:  direccion,
+    fecha_nacimiento:   fecha,
+    genero:             genero,
+    nit_dpi:            nit,
+    fecha_registro:     ahora,
+    // message también por si acaso
     message: [
-      '=== DATOS DEL NUEVO USUARIO ===',
-      '',
-      '👤 Nombre completo : ' + nombre,
-      '📧 Correo          : ' + correo,
-      '📞 Teléfono        : ' + telefono,
-      '🗺️  Departamento    : ' + depto,
-      '🏘️  Municipio       : ' + municipio,
-      '🏠 Dirección       : ' + direccion,
-      '🎂 Nacimiento      : ' + fecha,
-      '👤 Género          : ' + genero,
-      '🧾 NIT/DPI         : ' + nit,
-      '',
-      '🕐 Fecha registro  : ' + ahora,
-      '📱 Dispositivo     : ' + navigator.userAgent.substring(0, 100)
+      '👤 Nombre: '    + nombre,
+      '📧 Correo: '    + correo,
+      '📞 Teléfono: '  + telefono,
+      '🗺️ Depto: '     + depto,
+      '🏘️ Municipio: ' + municipio,
+      '🏠 Dirección: ' + direccion,
+      '🎂 Nacimiento: '+ fecha,
+      '👤 Género: '    + genero,
+      '🧾 NIT/DPI: '   + nit,
+      '🕐 Registro: '  + ahora
     ].join('\n')
   };
 
