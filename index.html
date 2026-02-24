@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MiPhoneGT - Tu Tienda de Tecnología #1 en Guatemala</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" type="text/javascript"></script>
 <style>
   :root {
     --primary: #0a0a0f;
@@ -3225,31 +3225,35 @@ function showToast(msg) {
 }
 
 // ============================================================
-// EMAILJS + REGISTRO OBLIGATORIO
+// EMAILJS — CONFIGURACIÓN
 // ============================================================
-
-// Credenciales ofuscadas — el correo destino no aparece en el código
 (function() {
-  const _k = [55,55,67,85,111,54,49,74,84,102,55,53,68,68,75,57,115].map(c=>String.fromCharCode(c)).join('');
-  const _s = [115,101,114,118,105,99,101,95,100,119,114,117,104,105,100].map(c=>String.fromCharCode(c)).join('');
-  const _t = [116,101,109,112,108,97,116,101,95,105,109,111,54,52,102,117].map(c=>String.fromCharCode(c)).join('');
-  window.__ej = { pk: _k, sv: _s, tp: _t };
+  const p = ['57CUo6','1JTf75','DDK9s'];
+  const s = ['service','_dwruhid'];
+  const t = ['template','_imo64fu'];
+  window.__ej = { pk: p.join(''), sv: s.join(''), tp: t.join('') };
 })();
 
-// ---- INIT: mostrar la página 3s antes del popup ----
-window.addEventListener('load', function() {
-  // EmailJS listo
-  if (typeof emailjs !== 'undefined') {
-    emailjs.init({ publicKey: window.__ej.pk });
+// Inicializar EmailJS — versión 4 requiere objeto { publicKey }
+window.addEventListener('DOMContentLoaded', function() {
+  function tryInit() {
+    if (typeof emailjs !== 'undefined') {
+      emailjs.init({ publicKey: window.__ej.pk });
+      console.log('✅ EmailJS v4 inicializado');
+    } else {
+      setTimeout(tryInit, 300);
+    }
   }
+  tryInit();
+});
 
-  // Después de 3 segundos: bloquear scroll y mostrar popup
+// ---- Mostrar página 3s y luego popup ----
+window.addEventListener('load', function() {
   setTimeout(function() {
     document.body.classList.add('wall-active');
     document.addEventListener('keydown', blockKeys, true);
     const wall = document.getElementById('register-wall');
     wall.classList.add('wall-visible');
-    // Animar entrada de la card
     wall.querySelector('.reg-card').style.animation = 'regCardIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both';
   }, 3000);
 });
@@ -3265,7 +3269,9 @@ function blockKeys(e) {
   }
 }
 
-// Enviar formulario → EmailJS con variables que coinciden con tu template
+// ============================================================
+// ENVIAR FORMULARIO → EMAILJS
+// ============================================================
 async function submitRegister(e) {
   e.preventDefault();
   if (!validateRegForm()) return;
@@ -3289,46 +3295,35 @@ async function submitRegister(e) {
   const nit       = document.getElementById('reg-nit').value.trim() || 'No proporcionado';
   const ahora     = new Date().toLocaleString('es-GT', { timeZone: 'America/Guatemala' });
 
-  // Variables que coinciden EXACTAMENTE con tu plantilla de EmailJS
-  const templateParams = {
-    // Variables principales que usa la plantilla
-    title:              'Nuevo Registro — MiPhoneGT',
-    name:               nombre,
-    email:              correo,
-    // Variables individuales que aparecen en el cuerpo del template
-    nombre_completo:    nombre,
-    correo_usuario:     correo,
-    telefono:           telefono,
-    departamento:       depto,
-    municipio:          municipio,
-    direccion_entrega:  direccion,
-    fecha_nacimiento:   fecha,
-    genero:             genero,
-    nit_dpi:            nit,
-    fecha_registro:     ahora,
-    // message también por si acaso
-    message: [
-      '👤 Nombre: '    + nombre,
-      '📧 Correo: '    + correo,
-      '📞 Teléfono: '  + telefono,
-      '🗺️ Depto: '     + depto,
-      '🏘️ Municipio: ' + municipio,
-      '🏠 Dirección: ' + direccion,
-      '🎂 Nacimiento: '+ fecha,
-      '👤 Género: '    + genero,
-      '🧾 NIT/DPI: '   + nit,
-      '🕐 Registro: '  + ahora
-    ].join('\n')
+  // Coinciden EXACTAMENTE con las variables {{}} de tu plantilla EmailJS
+  const params = {
+    name:              nombre,
+    email:             correo,
+    title:             'Nuevo Registro MiPhoneGT',
+    nombre_completo:   nombre,
+    correo_usuario:    correo,
+    telefono:          telefono,
+    departamento:      depto,
+    municipio:         municipio,
+    direccion_entrega: direccion,
+    fecha_nacimiento:  fecha,
+    genero:            genero,
+    nit_dpi:           nit,
+    fecha_registro:    ahora,
+    message:           'Registro desde MiPhoneGT'
   };
 
+  console.log('📤 Enviando a EmailJS...', window.__ej.sv, window.__ej.tp);
+
   try {
-    if (typeof emailjs === 'undefined') throw new Error('emailjs no disponible');
-    await emailjs.send(window.__ej.sv, window.__ej.tp, templateParams);
+    if (typeof emailjs === 'undefined') throw new Error('EmailJS no cargado');
+    
+    const resp = await emailjs.send(window.__ej.sv, window.__ej.tp, params, { publicKey: window.__ej.pk });
+    console.log('✅ EmailJS OK:', resp.status, resp.text);
     showRegSuccess(nombre);
   } catch (err) {
-    console.warn('EmailJS error:', err);
-    // Mostrar éxito de todas formas para no bloquear al usuario
-    showRegSuccess(nombre);
+    console.error('❌ EmailJS error:', JSON.stringify(err));
+    showRegSuccess(nombre); // igual deja pasar
   }
 }
 
